@@ -436,7 +436,7 @@ GULP.task('images', function() {
   * 08: COPY ASSESTS
   ****************************
 ********************************/
-// Dispatcher to copy assests out of the "assets" to the "dist" folder
+// Dispatcher to copy assets from "src/assets" folder
 GULP.task('copy', function(done) {
   if(PRODUCTION && FONT_ICONS){
     SEQUENCE(
@@ -454,21 +454,21 @@ GULP.task('copy', function(done) {
   }
 });
 
-// Copy assests to "assets/sources" 
+// Copy assets to "assets/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:src', function() {
   return GULP.src(PATHS.assets)
     .pipe(GULP.dest('assets/sources'));
 });
 
-// Copy assests to "assets/dist" for production build
+// Copy assets to "assets/dist" for production build
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:dist', function() {
   return GULP.src(PATHS.assets)
     .pipe(GULP.dest('assets/dist'));
 });
 
-// Copy assests to "assets/sources" 
+// Copy assets to "assets/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font:src', function() {
   return GULP.src(FONT_PATH)
@@ -476,7 +476,7 @@ GULP.task('copy:font:src', function() {
     .pipe(GULP.dest('assets/sources/fonts'));
 });
 
-// Copy assests to "assets/dist" for production build
+// Copy assets to "assets/dist" for production build
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font:dist', function() {
   return GULP.src(FONT_PATH)
