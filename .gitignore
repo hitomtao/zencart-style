@@ -40,3 +40,6 @@ src/components
 
 # Hidden Mac files
 .DS_Store
+
+# Temporary Folders
+temp/
