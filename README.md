@@ -3,8 +3,7 @@ Bootstrap Based CSS and JS for Zencart
 
 This is a template for generating Bootstrap Based CSS and JS for [Zencart](http://http://www.zen-cart.com).
 
-It has a Gulp-powered build system with these features:
-- Handlebars HTML templates with Panini
+It has a Gulp powered build system with these features:
 - Sass compilation and prefixing
 - JavaScript concatenation
 - Built-in BrowserSync server
@@ -24,7 +23,7 @@ You need to have these installed and set up first.
 
 ### Setup
 
-To set up the template, first download it with Git using your favourite Git Agent or manually:
+To set up the template, first clone this Git repository using your favourite Git Agent or manually:
 
 ```bash
 git clone https://github.com/dakanji/style-zencart style-zencart
