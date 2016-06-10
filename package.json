@@ -2,7 +2,7 @@
   "name": "style-zencart",
   "version": "1.0.0",
   "description": "Bootstrap Based CSS and JS for Zencart",
-  "main": "index.js",
+  "main": “gulpfile.js",
   "scripts": {
     "test": "echo \"No Test Specified\" && exit 1"
   },
@@ -15,7 +15,7 @@
     "Bootswatch",
     "Zencart"
   ],
-  "author": "Dayo Akanji",
+  "author": "Dayo Akanji <dakanji@users.nopely.github.com>“,
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dakanji/style-zencart/issues"
