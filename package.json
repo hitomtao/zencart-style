@@ -4,7 +4,6 @@
   "description": "Bootstrap Based CSS and JS for Zencart",
   "main": "gulpfile.js",
   "scripts": {
-    "test": "echo \"Error: No Test Defined \" && exit 1",
     "start": "gulp",
     "build": "gulp build --production"
   },
