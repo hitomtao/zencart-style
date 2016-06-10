@@ -45,5 +45,5 @@ src/components
 temp/
 
 # Misc others
-assets/index.html
-assets/img/
+dist/index.html
+dist/img/
