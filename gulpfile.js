@@ -425,14 +425,9 @@ GULP.task('javascript:minify:plugin', function() {
   * 07: PROCESS IMAGE FILES
   ****************************
 ********************************/
-// Copy image files to the "dist" folder
-// Compress for production build
+// Copy image files to the "assets" folder
 GULP.task('images', function() {
-  var imagemin = $.if(PRODUCTION, $.imagemin({
-    progressive: true
-  }));
   return GULP.src('src/assets/img/**/*')
-    .pipe(imagemin)
     .pipe(GULP.dest('assets/img'));
 });
 
