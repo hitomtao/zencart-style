@@ -1,5 +1,7 @@
-# style-zencart
+# Style Zencart
 Bootstrap Based CSS and JS for Zencart
+
+## Introduction
 
 This is a template for generating CSS and JS files for [Zencart](http://http://www.zen-cart.com) using Bootstrap 3.
 
