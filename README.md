@@ -48,17 +48,15 @@ cd /local/path/to/style-zencart
 npm install && bower install
 ```
 
-Finally, run `npm start` to run Gulp. Your style guide will be created in a sub folder called `dist`, viewable at this URL:
+When this is done, use `npm start` to run Gulp. 
 
-```
-http://localhost:8000
-```
+Your style guide will be created in a sub folder called `dist` and loaded in your browser
 
-The style guide will be loaded in your browser.
-- Edit the various files and your changes will be immediately reflected in the browser. 
-- Press `CTRL C` to stop the live reload process. 
+Edit the various files and your changes will be immediately reflected in the browser. 
 
-To create compressed, production-ready assets to deploy to Zencart, run `npm run build`.
+When you are done, press `CTRL C` to stop the livereload process. 
+
+To create compressed, production-ready assets for Zencart, run `npm run build`.
 
 If you have created a fork earlier, you can push your changes to your fork and then create a pull request for your proposed changes.
 
