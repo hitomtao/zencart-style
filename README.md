@@ -18,21 +18,22 @@ It comes with a [Gulp] (http://gulpjs.com/) powered build system with:
 
 ## Prerequisites
 
-You will need to have these installed and set up to use this template:
+You will need to have the following utilities installed to use this template:
 
-- [NodeJS](https://nodejs.org/en/) (0.10 or greater)
 - [Git](https://git-scm.com/)
+- [NodeJS](https://nodejs.org/en/) (0.10 or greater)
+- [Bower](https://bower.io/)
 
 ## Setup
 
-To set up the template, first clone this repository using your favourite Git Agent or manually:
+To set up the template, first clone this repository using your favourite Git agent or manually:
 
 ```bash
 cd /local/path/to/style-zencart
 git clone https://github.com/dakanji/style-zencart style-zencart
 ```
 
-If you wish to contribute to this project, clone the fork using your favourite Git Agent or manually:
+If you wish to contribute to this project, clone the fork using your favourite Git agent or manually:
 
 ```bash
 cd /local/path/to/style-zencart
@@ -48,7 +49,7 @@ cd /local/path/to/style-zencart
 npm install && bower install
 ```
 
-When this is done, use `npm start` to run Gulp. 
+When this is done, run `npm start` to run Gulp. 
 
 Your style guide will be created in a sub folder called `dist` and loaded in your browser
 
