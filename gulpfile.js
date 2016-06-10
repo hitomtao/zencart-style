@@ -37,7 +37,7 @@ const CSS_PROCESS = [
 const PRODUCTION = !!(ARGV.production);
 
 // Flag whether to distribute source files
-const DIST_SRC = false;
+const DIST_SRC = true;
 
 // Port to use for the development server.
 const DEV_PORT = 8000;
@@ -51,8 +51,8 @@ const FONT_SASS='src/assets/scss/components/fonticon/**/scss/';
 const FONT_PATH='src/assets/scss/components/fonticon/**/fonts/**/*';
 
 // Misc filesystem paths
-const JS_SRC = 'dist/assets/src/js';
-const JS_DIST = 'dist/assets/js';
+const JS_SRC = 'assets/sources/js';
+const JS_DIST = 'assets/dist/js';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
 const JQ_URI = PRODUCTION ? JS_DIST : JS_SRC;
 const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="' 
@@ -85,16 +85,16 @@ const PATHS = {
 // Build the site
 GULP.task('build', function(done) {
   SEQUENCE(
-    ['clean:dist', 'clean:temp'], 
+    ['clean:assets', 'clean:tmp'], 
     ['pages', 'sass', 'javascript', 'images', 'copy'], 
-    ['clean:temp', 'clean:source'], 
+    ['clean:tmp', 'clean:sources'], 
   done);
 });
 
 // Start a server with LiveReload to preview the site
 GULP.task('server', ['build'], function() {
   BROWSER.init({
-    server: 'dist', port: DEV_PORT
+    server: 'assets', port: DEV_PORT
   });
 });
 
@@ -104,20 +104,20 @@ GULP.task('server', ['build'], function() {
   ****************************
 ********************************/
 // Remove the "dist" folder if it exists
-GULP.task('clean:dist', function(done) {
-  return REMOVE('dist/**');
+GULP.task('clean:assets', function(done) {
+  return REMOVE('assets/**');
 });
 
-// Remove the "temp" folder if it exists
-GULP.task('clean:temp', function() {
-  return REMOVE('temp/**');
+// Remove the "tmp" folder if it exists
+GULP.task('clean:tmp', function() {
+  return REMOVE('tmp/**');
 });
 
-// Remove the "dist/assets/src" folder if flagged
-GULP.task('clean:source', function() {
+// Remove the "assets/sources" folder if flagged
+GULP.task('clean:sources', function() {
   var stream;
   if(PRODUCTION && !DIST_SRC) {
-    stream = REMOVE('dist/assets/src/**');
+    stream = REMOVE('assets/sources/**');
   }
   return stream;
 });
@@ -142,22 +142,22 @@ GULP.task('pages:main', function() {
       data: 'src/data/',
       helpers: 'src/helpers/'
     }))
-    .pipe(GULP.dest('temp/html/raw'));
+    .pipe(GULP.dest('tmp/html/raw'));
 });
 
 // Change links to asset files for production build
 GULP.task('pages:links', function() {
-  var main_css = '/assets/src/css/main.css?' + CACHEFLAG;
-  var main_js = '/assets/src/js/main.js?' + CACHEFLAG;
-  var custom_css = '/assets/src/css/custom.css?' + CACHEFLAG;
-  var plugin_js = '/assets/src/js/plugin.js?' + CACHEFLAG;
-  var fonticon_css = '/assets/src/css/fonticon.css?' + CACHEFLAG;
+  var main_css = '/sources/css/main.css?' + CACHEFLAG;
+  var main_js = '/sources/js/main.js?' + CACHEFLAG;
+  var custom_css = '/sources/css/custom.css?' + CACHEFLAG;
+  var plugin_js = '/sources/js/plugin.js?' + CACHEFLAG;
+  var fonticon_css = '/sources/css/fonticon.css?' + CACHEFLAG;
   if(PRODUCTION){
-    main_css = '/assets/css/main.min.css?' + CACHEFLAG;
-    main_js = '/assets/js/main.min.js?' + CACHEFLAG;
-    custom_css = '/assets/css/custom.min.css?' + CACHEFLAG;
-    plugin_js = '/assets/js/plugin.min.js?' + CACHEFLAG;
-    fonticon_css = '/assets/css/fonticon.min.css?' + CACHEFLAG;
+    main_css = '/dist/css/main.min.css?' + CACHEFLAG;
+    main_js = '/dist/js/main.min.js?' + CACHEFLAG;
+    custom_css = '/dist/css/custom.min.css?' + CACHEFLAG;
+    plugin_js = '/dist/js/plugin.min.js?' + CACHEFLAG;
+    fonticon_css = '/dist/css/fonticon.min.css?' + CACHEFLAG;
   }
   if(!FONT_ICONS){
     fonticon_css = '';
@@ -170,16 +170,16 @@ GULP.task('pages:links', function() {
     'fonticon_css': fonticon_css,
     'jquery_js': JQ_WRITE
   });
-  return GULP.src('temp/html/raw/**/*.html')
+  return GULP.src('tmp/html/raw/**/*.html')
     .pipe(replace_html)
-    .pipe(GULP.dest('temp/html/fixed'));
+    .pipe(GULP.dest('tmp/html/fixed'));
 });
 
 // Prettify temp HTML files and move to dist folder
 GULP.task('pages:prettify', function() {
-  return GULP.src('temp/html/fixed/**/*.html')
+  return GULP.src('tmp/html/fixed/**/*.html')
     .pipe($.prettify())
-    .pipe(GULP.dest('dist'));
+    .pipe(GULP.dest('assets'));
 });
 
 // Rebuild HTML files
@@ -190,7 +190,7 @@ GULP.task('pages:reset', function(done) {
 
 // Rebuild HTML files
 GULP.task('pages:regen', function(done) {
-  SEQUENCE(['pages', 'sass'], ['clean:temp', 'clean:source'], done);
+  SEQUENCE(['pages', 'sass'], ['clean:tmp', 'clean:sources'], done);
 });
 
 /*******************************
@@ -234,7 +234,7 @@ GULP.task('sass:main:build', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe(GULP.dest('dist/assets/src/css'));
+    .pipe(GULP.dest('assets/sources/css'));
 });
 
 // Minify main CSS file for production build
@@ -249,12 +249,12 @@ GULP.task('sass:main:minify', function() {
       new RegExp('^\.(popover|tooltip)')
     ]
   });
-  return GULP.src('dist/assets/src/css/main.css')
+  return GULP.src('assets/sources/css/main.css')
     .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
-    .pipe(GULP.dest('dist/assets/css'));
+    .pipe(GULP.dest('assets/dist/css'));
 });
 
 // Compile custom Sass into CSS
@@ -268,7 +268,7 @@ GULP.task('sass:custom:build', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe(GULP.dest('dist/assets/src/css'));
+    .pipe(GULP.dest('assets/sources/css'));
 });
 
 // Minify custom CSS file for production build
@@ -280,12 +280,12 @@ GULP.task('sass:custom:minify', function() {
       new RegExp('^\.is-.*')
     ]
   });
-  return GULP.src('dist/assets/src/css/custom.css')
+  return GULP.src('assets/sources/css/custom.css')
     .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
-    .pipe(GULP.dest('dist/assets/css'));
+    .pipe(GULP.dest('assets/dist/css'));
 });
 
 // Prep fonticon Sass
@@ -301,7 +301,7 @@ GULP.task('sass:fonticon:prep', function(done) {
         browsers: COMPATIBILITY
       }))
       .pipe($.flatten())
-      .pipe(GULP.dest('temp/fonticons/css'));
+      .pipe(GULP.dest('tmp/fonticons/css'));
   }
   return stream;
 });
@@ -310,12 +310,12 @@ GULP.task('sass:fonticon:prep', function(done) {
 GULP.task('sass:fonticon:build', function() {
   var stream;
   if(FONT_ICONS){
-    stream = GULP.src('temp/fonticons/css/*.css')
+    stream = GULP.src('tmp/fonticons/css/*.css')
       .pipe($.sourcemaps.init())
       .pipe($.concat('fonticon.css'))
       .pipe(POSTCSS([ require('postcss-normalize-charset') ]))
       .pipe($.sourcemaps.write())
-      .pipe(GULP.dest('dist/assets/src/css'));
+      .pipe(GULP.dest('assets/sources/css'));
   }
   return stream;
 });
@@ -329,17 +329,17 @@ GULP.task('sass:fonticon:minify', function() {
       new RegExp('^\.is-.*')
     ]
   });
-  return GULP.src('dist/assets/src/css/fonticon.css')
+  return GULP.src('assets/sources/css/fonticon.css')
     .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
-    .pipe(GULP.dest('dist/assets/css'));
+    .pipe(GULP.dest('assets/dist/css'));
 });
 
 // Rebuild scss files
 GULP.task('sass:regen', function(done) {
-  SEQUENCE('sass', ['clean:temp', 'clean:source'], done);
+  SEQUENCE('sass', ['clean:tmp', 'clean:sources'], done);
 });
 
 /*******************************
@@ -433,7 +433,7 @@ GULP.task('images', function() {
   }));
   return GULP.src('src/assets/img/**/*')
     .pipe(imagemin)
-    .pipe(GULP.dest('dist/assets/img'));
+    .pipe(GULP.dest('assets/img'));
 });
 
 /*******************************
@@ -459,34 +459,34 @@ GULP.task('copy', function(done) {
   }
 });
 
-// Copy assests to "dist/assets/src" 
+// Copy assests to "assets/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:src', function() {
   return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('dist/assets/src'));
+    .pipe(GULP.dest('assets/sources'));
 });
 
-// Copy assests to "dist/assets" for production build
+// Copy assests to "assets/dist" for production build
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:dist', function() {
   return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('dist/assets'));
+    .pipe(GULP.dest('assets/dist'));
 });
 
-// Copy assests to "dist/assets/src" 
+// Copy assests to "assets/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font:src', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
-    .pipe(GULP.dest('dist/assets/src/fonts'));
+    .pipe(GULP.dest('assets/sources/fonts'));
 });
 
-// Copy assests to "dist/assets" for production build
+// Copy assests to "assets/dist" for production build
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font:dist', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
-    .pipe(GULP.dest('dist/assets/fonts'));
+    .pipe(GULP.dest('assets/dist/fonts'));
 });
 
 /*******************************
