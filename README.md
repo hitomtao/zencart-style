@@ -1,10 +1,11 @@
 # style-zencart
 Bootstrap Based CSS and JS for Zencart
 
-This is a template for generating Bootstrap Based CSS and JS for [Zencart](http://http://www.zen-cart.com).
-This template is based on the [Bootswatch Bootstrap Template] (https://github.com/thomaspark/bootswatch)
+This is a template for generating CSS and JS files for [Zencart](http://http://www.zen-cart.com) using Bootstrap 3.
 
-It adds a Gulp powered build system with:
+The template is based on the [Bootswatch Bootstrap Template] (https://github.com/thomaspark/bootswatch) and is released under the [MIT License] (https://github.com/dakanji/style-zencart/blob/master/LICENSE)
+
+It comes with a [Gulp] (http://gulpjs.com/) powered build system with:
 - Sass compilation and prefixing
 - JavaScript concatenation
 - Built-in BrowserSync server
