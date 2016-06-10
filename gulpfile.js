@@ -51,8 +51,8 @@ const FONT_SASS='src/assets/scss/components/fonticon/**/scss/';
 const FONT_PATH='src/assets/scss/components/fonticon/**/fonts/**/*';
 
 // Misc filesystem paths
-const JS_SRC = 'assets/sources/js';
-const JS_DIST = 'assets/dist/js';
+const JS_SRC = 'dist/sources/js';
+const JS_DIST = 'dist/production/js';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
 const JQ_URI = PRODUCTION ? JS_DIST : JS_SRC;
 const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="' 
@@ -85,7 +85,7 @@ const PATHS = {
 // Build the site
 GULP.task('build', function(done) {
   SEQUENCE(
-    ['clean:assets', 'clean:tmp'], 
+    ['clean:dist', 'clean:tmp'], 
     ['pages', 'sass', 'javascript', 'images', 'copy'], 
     ['clean:tmp', 'clean:sources'], 
   done);
@@ -94,7 +94,7 @@ GULP.task('build', function(done) {
 // Start a server with LiveReload to preview the site
 GULP.task('server', ['build'], function() {
   BROWSER.init({
-    server: 'assets', port: DEV_PORT
+    server: 'dist', port: DEV_PORT
   });
 });
 
@@ -104,8 +104,8 @@ GULP.task('server', ['build'], function() {
   ****************************
 ********************************/
 // Remove the "dist" folder if it exists
-GULP.task('clean:assets', function(done) {
-  return REMOVE('assets/**');
+GULP.task('clean:dist', function(done) {
+  return REMOVE('dist/**');
 });
 
 // Remove the "tmp" folder if it exists
@@ -113,11 +113,11 @@ GULP.task('clean:tmp', function() {
   return REMOVE('tmp/**');
 });
 
-// Remove the "assets/sources" folder if flagged
+// Remove the "dist/sources" folder if flagged
 GULP.task('clean:sources', function() {
   var stream;
   if(PRODUCTION && !DIST_SRC) {
-    stream = REMOVE('assets/sources/**');
+    stream = REMOVE('dist/sources/**');
   }
   return stream;
 });
@@ -153,11 +153,11 @@ GULP.task('pages:links', function() {
   var plugin_js = '/sources/js/plugin.js?' + CACHEFLAG;
   var fonticon_css = '/sources/css/fonticon.css?' + CACHEFLAG;
   if(PRODUCTION){
-    main_css = '/dist/css/main.min.css?' + CACHEFLAG;
-    main_js = '/dist/js/main.min.js?' + CACHEFLAG;
-    custom_css = '/dist/css/custom.min.css?' + CACHEFLAG;
-    plugin_js = '/dist/js/plugin.min.js?' + CACHEFLAG;
-    fonticon_css = '/dist/css/fonticon.min.css?' + CACHEFLAG;
+    main_css = '/production/css/main.min.css?' + CACHEFLAG;
+    main_js = '/production/js/main.min.js?' + CACHEFLAG;
+    custom_css = '/production/css/custom.min.css?' + CACHEFLAG;
+    plugin_js = '/production/js/plugin.min.js?' + CACHEFLAG;
+    fonticon_css = '/production/css/fonticon.min.css?' + CACHEFLAG;
   }
   if(!FONT_ICONS){
     fonticon_css = '';
@@ -179,7 +179,7 @@ GULP.task('pages:links', function() {
 GULP.task('pages:prettify', function() {
   return GULP.src('tmp/html/fixed/**/*.html')
     .pipe($.prettify())
-    .pipe(GULP.dest('assets'));
+    .pipe(GULP.dest('dist'));
 });
 
 // Rebuild HTML files
@@ -234,7 +234,7 @@ GULP.task('sass:main:build', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe(GULP.dest('assets/sources/css'));
+    .pipe(GULP.dest('dist/sources/css'));
 });
 
 // Minify main CSS file for production build
@@ -249,12 +249,12 @@ GULP.task('sass:main:minify', function() {
       new RegExp('^\.(popover|tooltip)')
     ]
   });
-  return GULP.src('assets/sources/css/main.css')
+  return GULP.src('dist/sources/css/main.css')
     .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
-    .pipe(GULP.dest('assets/dist/css'));
+    .pipe(GULP.dest('dist/production/css'));
 });
 
 // Compile custom Sass into CSS
@@ -268,7 +268,7 @@ GULP.task('sass:custom:build', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe(GULP.dest('assets/sources/css'));
+    .pipe(GULP.dest('dist/sources/css'));
 });
 
 // Minify custom CSS file for production build
@@ -280,12 +280,12 @@ GULP.task('sass:custom:minify', function() {
       new RegExp('^\.is-.*')
     ]
   });
-  return GULP.src('assets/sources/css/custom.css')
+  return GULP.src('dist/sources/css/custom.css')
     .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
-    .pipe(GULP.dest('assets/dist/css'));
+    .pipe(GULP.dest('dist/production/css'));
 });
 
 // Prep fonticon Sass
@@ -315,7 +315,7 @@ GULP.task('sass:fonticon:build', function() {
       .pipe($.concat('fonticon.css'))
       .pipe(POSTCSS([ require('postcss-normalize-charset') ]))
       .pipe($.sourcemaps.write())
-      .pipe(GULP.dest('assets/sources/css'));
+      .pipe(GULP.dest('dist/sources/css'));
   }
   return stream;
 });
@@ -329,12 +329,12 @@ GULP.task('sass:fonticon:minify', function() {
       new RegExp('^\.is-.*')
     ]
   });
-  return GULP.src('assets/sources/css/fonticon.css')
+  return GULP.src('dist/sources/css/fonticon.css')
     .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
-    .pipe(GULP.dest('assets/dist/css'));
+    .pipe(GULP.dest('dist/production/css'));
 });
 
 // Rebuild scss files
@@ -425,10 +425,10 @@ GULP.task('javascript:minify:plugin', function() {
   * 07: PROCESS IMAGE FILES
   ****************************
 ********************************/
-// Copy image files to the "assets" folder
+// Copy image files to the "dist" folder
 GULP.task('images', function() {
   return GULP.src('src/assets/img/**/*')
-    .pipe(GULP.dest('assets/img'));
+    .pipe(GULP.dest('dist/img'));
 });
 
 /*******************************
@@ -454,34 +454,34 @@ GULP.task('copy', function(done) {
   }
 });
 
-// Copy assets to "assets/sources" 
+// Copy assets to "dist/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:src', function() {
   return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('assets/sources'));
+    .pipe(GULP.dest('dist/sources'));
 });
 
-// Copy assets to "assets/dist" for production build
+// Copy assets to "dist/production" for production build
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:dist', function() {
   return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('assets/dist'));
+    .pipe(GULP.dest('dist/production'));
 });
 
-// Copy assets to "assets/sources" 
+// Copy assets to "dist/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font:src', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
-    .pipe(GULP.dest('assets/sources/fonts'));
+    .pipe(GULP.dest('dist/sources/fonts'));
 });
 
-// Copy assets to "assets/dist" for production build
+// Copy assets to "dist/production" for production build
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font:dist', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
-    .pipe(GULP.dest('assets/dist/fonts'));
+    .pipe(GULP.dest('dist/production/fonts'));
 });
 
 /*******************************
