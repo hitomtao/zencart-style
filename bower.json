@@ -1,0 +1,22 @@
+{
+  "name": "style-zencart",
+  "homepage": "https://github.com/dakanji/style-zencart",
+  "authors": [
+    "Dayo Akanji <dakanji@user.noreply.github.com>"
+  ],
+  "description": "Bootstrap Based CSS and JS for Zencart",
+  "main": "gulpfile.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "private": true,
+  "devDependencies": {
+    "jquery-migrate-1.4.1": "https://code.jquery.com/jquery-migrate-1.4.1.js",
+    "jquery-2.2.4": "https://code.jquery.com/jquery-2.2.4.js"
+  }
+}
