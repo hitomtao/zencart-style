@@ -53,12 +53,14 @@ When this is done, run `npm start` to run Gulp.
 
 Your style guide will be created in a sub folder called `dist` and loaded in your browser
 
-Edit the various files and your changes will be immediately reflected in the browser. 
+Edit the various files in the src folder as desired and your changes will be immediately reflected in the browser. 
 
 When you are done, press `CTRL C` to stop the livereload process. 
 
-To create compressed, production-ready assets for Zencart, run `npm run build`.
+To create compressed, production ready assets for Zencart, run `npm run build`.
 
-If you have created a fork earlier, you can push your changes to your fork and then create a pull request for your proposed changes.
+If you created a fork earlier, you can push your changes to your fork and then create a pull request with your changes. 
+
+- NOTE: This can only be accepted for production ready runs.
 
 You can read about contributing [HERE] (http://docs.zen-cart.com/Contributing/main).
