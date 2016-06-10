@@ -43,3 +43,7 @@ src/components
 
 # Temporary Folders
 temp/
+
+# Misc others
+dist/index.html
+dist/assets/src/
