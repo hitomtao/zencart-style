@@ -1,6 +1,6 @@
 /*!
  * Demo Helper.js - JavaScript routines for Zencart Style Demo Page
- * Copyright (c) 2016 Dayo Akanji <dakanji@users.no.reply.github.com>
+ * Copyright (c) 2016 Dayo Akanji <dakanji@user.noreply.github.com>
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
