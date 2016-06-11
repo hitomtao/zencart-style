@@ -43,7 +43,9 @@ src/components
 
 # Temporary Folders
 temp/
+tmp/
 
 # Misc others
 dist/index.html
 dist/img/
+dist/dev/
