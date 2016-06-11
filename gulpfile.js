@@ -8,23 +8,21 @@
   * 01: INITIALISE
   ****************************
 ********************************/
-const $           = require('gulp-load-plugins')();
-const ARGV        = require('yargs').argv;
-const BROWSER     = require('browser-sync');
-const GULP        = require('gulp');
-const PANINI      = require('panini');
-const REMOVE      = require('del');
-const SEQUENCE    = require('run-sequence');
-const ES          = require('event-stream');
-const EXT_NAME    = require('gulp-extname');
-const SWAP_HTML   = require('gulp-html-replace');
-const ADD_STRING  = require('gulp-inject-string');
-const SWAP_TEXT   = require('gulp-replace');
-const UGLIFY      = require('gulp-uglify');
-const CACHEFLAG   = Math.floor(Math.random()*900000) + 100000;
+const $              = require('gulp-load-plugins')();
+const ARGV           = require('yargs').argv;
+const BROWSER        = require('browser-sync');
+const GULP           = require('gulp');
+const PANINI         = require('panini');
+const REMOVE         = require('del');
+const SEQUENCE       = require('run-sequence');
+const ES             = require('event-stream');
+const EXT_NAME       = require('gulp-extname');
+const SWAP_HTML      = require('gulp-html-replace');
+const ADD_STRING     = require('gulp-inject-string');
+const SWAP_TEXT      = require('gulp-replace');
+const UGLIFY         = require('gulp-uglify');
 
-const POSTCSS     = require('gulp-postcss');
-const CSS_PROCESS = [
+const CSS_PROCESS    = [
   require('postcss-normalize-charset'),
   require('postcss-remove-prefixes'), 
   require('postcss-ordered-values'),
@@ -42,6 +40,9 @@ const DEV_PORT = 8000;
 
 // Browsers to target when prefixing CSS.
 const COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
+
+// Random cache buster
+const CACHEFLAG      = Math.floor(Math.random()*900000) + 100000;
 
 // Use additional font icons
 const FONT_ICONS = true;
@@ -251,7 +252,7 @@ GULP.task('sass:main:compile', function() {
     .pipe($.sourcemaps.init())
     .pipe($.sass()
       .on('error', $.sass.logError))
-    .pipe(POSTCSS(CSS_PROCESS))
+    .pipe($.postcss(CSS_PROCESS))
     .pipe($.autoprefixer({
       browsers: COMPATIBILITY
     }))
@@ -280,7 +281,7 @@ GULP.task('sass:custom:compile', function() {
     .pipe($.sourcemaps.init())
     .pipe($.sass()
       .on('error', $.sass.logError))
-    .pipe(POSTCSS(CSS_PROCESS))
+    .pipe($.postcss(CSS_PROCESS))
     .pipe($.autoprefixer({
       browsers: COMPATIBILITY
     }))
@@ -341,7 +342,7 @@ GULP.task('sass:fonticon:compile', function() {
     stream = GULP.src('tmp/fonticons/css/*.css')
       .pipe($.sourcemaps.init())
       .pipe($.concat('fonticon.css'))
-      .pipe(POSTCSS(CSS_PROCESS))
+      .pipe($.postcss(CSS_PROCESS))
       .pipe($.sourcemaps.write())
       .pipe(GULP.dest('dist/dev/css'));
   }
