@@ -5,7 +5,7 @@ Bootstrap Based CSS and JS for [Zencart](http://http://www.zen-cart.com) E-Comme
 
 This is a template for generating CSS and JS files for Zencart using Bootstrap.
 
-The template is based on the [Bootswatch Bootstrap Template] (https://github.com/thomaspark/bootswatch) and is released under the [MIT License] (https://github.com/dakanji/style-zencart/blob/master/LICENSE)
+The template is based on the [Bootswatch] (https://github.com/thomaspark/bootswatch) and is released under the [MIT License] (https://github.com/dakanji/style-zencart/blob/master/LICENSE)
 
 It comes with a [Gulp] (http://gulpjs.com/) powered build system with:
 - Sass compilation and prefixing
@@ -49,18 +49,14 @@ cd /local/path/to/style-zencart
 npm install && bower install
 ```
 
-When this is done, run `npm start` to run Gulp. 
+When this is done, run `npm run dev` to run Gulp for development. 
 
 Your style guide will be created in a sub folder called `dist` and loaded in your browser
 
-Edit the various files in the src folder as desired and your changes will be immediately reflected in the browser. 
+You can now edit the various files in the src folder as desired and your changes will be immediately reflected in the browser. 
 
-When you are done, press `CTRL C` to stop the livereload process. 
+When you are done, press `CTRL C` to stop the livereload process and run `npm run prod` to create compressed, production ready assets for ZENCART.
 
-To create compressed, production ready assets for Zencart, run `npm run build`.
+If you created a fork earlier, you can push your production changes to your fork and then create a pull request with your changes. 
 
-If you created a fork earlier, you can push your changes to your fork and then create a pull request with your changes. 
-
-- NOTE: This can only be accepted for production ready runs.
-
-You can read about contributing [HERE] (http://docs.zen-cart.com/Contributing/main).
+You can read more about contributing to ZENCART about contributing [HERE] (http://docs.zen-cart.com/Contributing/main).

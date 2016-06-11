@@ -4,8 +4,8 @@
   "description": "Bootstrap Based CSS and JS for Zencart",
   "main": "gulpfile.js",
   "scripts": {
-    "start": "gulp",
-    "build": "gulp build --production"
+    "dev": "gulp",
+    "prod": "gulp build --production"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "gulp-if": "^2.0.1",
     "gulp-inject-string": "^1.1.0",
     "gulp-load-plugins": "^1.2.4",
+    "gulp-multistream": "^0.1.0",
     "gulp-postcss": "^6.1.1",
     "gulp-prettify": "^0.4.0",
     "gulp-rename": "^1.2.2",
