@@ -48,11 +48,11 @@ $entypo-margin: 0.2em;
 
 @font-face {
   font-family: 'entypo-icons';
-  src: url('#{$entypo-font-path}.eot?#{$entypo-random-tag}');
-  src: url('#{$entypo-font-path}.eot?#{$entypo-random-tag}#iefix') format('embedded-opentype'),
-       url('#{$entypo-font-path}.woff?#{$entypo-random-tag}') format('woff'),
-       url('#{$entypo-font-path}.ttf?#{$entypo-random-tag}') format('truetype'),
-       url('#{$entypo-font-path}.svg?#{$entypo-random-tag}#entypo-icons') format('svg');
+  src: url('#{$entypo-font-path}.eot');
+  src: url('#{$entypo-font-path}.eot?#iefix') format('embedded-opentype'),
+       url('#{$entypo-font-path}.woff') format('woff'),
+       url('#{$entypo-font-path}.ttf') format('truetype'),
+       url('#{$entypo-font-path}.svg?#entypo-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
