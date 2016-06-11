@@ -20,6 +20,7 @@ const EXT_NAME    = require('gulp-extname');
 const SWAP_HTML   = require('gulp-html-replace');
 const ADD_STRING  = require('gulp-inject-string');
 const SWAP_TEXT   = require('gulp-replace');
+const UGLIFY      = require('gulp-uglify');
 const CACHEFLAG   = Math.floor(Math.random()*900000) + 100000;
 
 const POSTCSS     = require('gulp-postcss');
@@ -36,9 +37,6 @@ const CSS_PROCESS = [
 // Flag whether to build for production
 const PRODUCTION = !!(ARGV.production);
 
-// Flag whether to distribute source files
-const DIST_SRC = true;
-
 // Port to use for the development server.
 const DEV_PORT = 8000;
 
@@ -46,17 +44,24 @@ const DEV_PORT = 8000;
 const COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
 // Use additional font icons
-const FONT_ICONS = false;
+const FONT_ICONS = true;
 const FONT_SASS='src/assets/scss/components/fonticon/**/scss/';
 const FONT_PATH='src/assets/scss/components/fonticon/**/fonts/**/*';
 
 // Misc filesystem paths
+const JS_DEV = 'dist/dev/js';
 const JS_SRC = 'dist/sources/js';
 const JS_DIST = 'dist/production/js';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
-const JQ_URI = PRODUCTION ? JS_DIST : JS_SRC;
+const JQ_VER = '2.2.4';
+const JQ_MIG = '1.4.1';
+const JQ_URI = PRODUCTION ? JS_DIST : JS_DEV;
 const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="' 
-        + JQ_URI.replace('dist/','') + '/jquery' + JS_EXT 
+        + JQ_URI.replace('dist/','/') + '/jquery' + JS_EXT 
+        + '"><\\/script>\');</script>';
+
+const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<script src="' 
+        + JQ_URI.replace('dist/','/') + '/jquery-migrate' + JS_EXT 
         + '"><\\/script>\');</script>';
 
 // File paths to various assets are defined here.
@@ -67,13 +72,19 @@ const PATHS = {
     '!src/assets/{img,js,scss}/**/',
     '!src/assets/{img,js,scss}/'
   ],
+  js_plugins: [
+    'src/assets/js/**/*.js',
+    '!src/assets/js/demopage/**/*.js'
+  ],
+  demo_js: [
+    'src/assets/js/demopage/**/*.js'
+  ],
   sass_fonticon_include: [
     FONT_SASS,
-    'bower_components/foundation-sites/scss/util/',
+    'src/assets/scss/components/fonticon/foundation-icons/scss/'
   ],
-  javascript_plugin: [
-    'src/assets/js/**/*.js',
-    '!src/assets/js/bootstrap.js'
+  glyphicons: [
+    'src/components/bootstrap-sass/assets/fonts/bootstrap/**/*'
   ]
 };
 
@@ -116,8 +127,8 @@ GULP.task('clean:tmp', function() {
 // Remove the "dist/sources" folder if flagged
 GULP.task('clean:sources', function() {
   var stream;
-  if(PRODUCTION && !DIST_SRC) {
-    stream = REMOVE('dist/sources/**');
+  if(PRODUCTION) {
+    stream = REMOVE('dist/dev/**');
   }
   return stream;
 });
@@ -147,11 +158,14 @@ GULP.task('pages:main', function() {
 
 // Change links to asset files for production build
 GULP.task('pages:links', function() {
-  var main_css = '/sources/css/main.css?' + CACHEFLAG;
-  var main_js = '/sources/js/main.js?' + CACHEFLAG;
-  var custom_css = '/sources/css/custom.css?' + CACHEFLAG;
-  var plugin_js = '/sources/js/plugin.js?' + CACHEFLAG;
-  var fonticon_css = '/sources/css/fonticon.css?' + CACHEFLAG;
+  var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + '.min.js';
+  var jquery_migrate_js = '//code.jquery.com/jquery-migrate-' + JQ_MIG + '.min.js';
+  var main_js = '/dev/js/main.js?' + CACHEFLAG;
+  var plugin_js = '/dev/js/plugin.js?' + CACHEFLAG;
+  var demo_js = '/dev/js/demo.js?' + CACHEFLAG;
+  var main_css = '/dev/css/main.css?' + CACHEFLAG;
+  var custom_css = '/dev/css/custom.css?' + CACHEFLAG;
+  var fonticon_css = '/dev/css/fonticon.css?' + CACHEFLAG;
   if(PRODUCTION){
     main_css = '/production/css/main.min.css?' + CACHEFLAG;
     main_js = '/production/js/main.min.js?' + CACHEFLAG;
@@ -163,12 +177,16 @@ GULP.task('pages:links', function() {
     fonticon_css = '';
   }
   var replace_html = SWAP_HTML({
-    'main_css': main_css,
+    'jquery_js': jquery_js,
+    'jquery_fallback': JQ_WRITE,
+    'jquery_migrate_js': jquery_migrate_js,
+    'jquery_migrate_fallback': JM_WRITE,
     'main_js': main_js,
+    'plugin_js': plugin_js, 
+    'demo_js': demo_js, 
+    'main_css': main_css,
     'custom_css': custom_css,
-    'plugin_js': plugin_js,
     'fonticon_css': fonticon_css,
-    'jquery_js': JQ_WRITE
   });
   return GULP.src('tmp/html/raw/**/*.html')
     .pipe(replace_html)
@@ -202,29 +220,33 @@ GULP.task('pages:regen', function(done) {
 GULP.task('sass', function(done) {
   if(PRODUCTION && FONT_ICONS){
     SEQUENCE(
-      ['sass:main:build', 'sass:custom:build', 'sass:fonticon:prep'], 
+      ['sass:main:compile', 'sass:custom:compile', 'sass:fonticon:init', 'sass:fonticon:prep'], 
+      ['sass:main:build', 'sass:custom:build', 'sass:fonticon:compile'], 
       ['sass:main:minify', 'sass:fonticon:build'],
       ['sass:custom:minify'], 
       ['sass:fonticon:minify'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
     SEQUENCE(
-      ['sass:main:build', 'sass:custom:build', 'sass:fonticon:prep'], 
-      ['sass:fonticon:build'], 
+      ['sass:main:compile', 'sass:custom:compile', 'sass:fonticon:init', 'sass:fonticon:prep'], 
+      ['sass:fonticon:compile'], 
     done);
   } else if(PRODUCTION && !FONT_ICONS){
     SEQUENCE(
+      ['sass:main:compile', 'sass:custom:compile', 'sass:fonticon:init'], 
       ['sass:main:build', 'sass:custom:build'], 
-      ['sass:main:minify'], 
+      ['sass:main:minify'],
       ['sass:custom:minify'], 
     done);
   } else {
-    SEQUENCE(['sass:main:build', 'sass:custom:build'], done);
+    SEQUENCE(
+      ['sass:main:compile', 'sass:custom:compile', 'sass:fonticon:init'], 
+    done);
   }
 });
 
 // Compile main Sass into CSS
-GULP.task('sass:main:build', function() {
+GULP.task('sass:main:compile', function() {
   return GULP.src('src/assets/scss/main.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
@@ -234,23 +256,18 @@ GULP.task('sass:main:build', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
+    .pipe(GULP.dest('dist/dev/css'));
+});
+
+// Create main CSS source file for production build
+GULP.task('sass:main:build', function() {
+  return GULP.src('dist/dev/css/main.css')
     .pipe(GULP.dest('dist/sources/css'));
 });
 
 // Minify main CSS file for production build
 GULP.task('sass:main:minify', function() {
-  var uncss = $.uncss({
-    html: ['src/**/*.html'],
-    ignore: [
-      new RegExp('\.in'),
-      new RegExp('\.collaps*'),
-      new RegExp('\.(open|close|fade|modal)'),
-      new RegExp('\.(col|carousel|dropdown)-'),
-      new RegExp('^\.(popover|tooltip)')
-    ]
-  });
   return GULP.src('dist/sources/css/main.css')
-    .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
@@ -258,7 +275,7 @@ GULP.task('sass:main:minify', function() {
 });
 
 // Compile custom Sass into CSS
-GULP.task('sass:custom:build', function() {
+GULP.task('sass:custom:compile', function() {
   return GULP.src('src/assets/scss/custom.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
@@ -268,24 +285,35 @@ GULP.task('sass:custom:build', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
+    .pipe(GULP.dest('dist/dev/css'));
+});
+
+// Create custom CSS source file for production build
+GULP.task('sass:custom:build', function() {
+  return GULP.src('dist/dev/css/custom.css')
     .pipe(GULP.dest('dist/sources/css'));
 });
 
 // Minify custom CSS file for production build
 GULP.task('sass:custom:minify', function() {
-  var uncss = $.uncss({
-    html: ['src/**/*.html'],
-    ignore: [
-      new RegExp('^meta\..*'),
-      new RegExp('^\.is-.*')
-    ]
-  });
   return GULP.src('dist/sources/css/custom.css')
-    .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
     .pipe(GULP.dest('dist/production/css'));
+});
+
+
+GULP.task('sass:fonticon:init', function(done) {
+  var stream;
+  if(PRODUCTION){
+  	stream = GULP.src(PATHS.glyphicons)
+      .pipe(GULP.dest('dist/production/fonts/bootstrap'))   
+  } else {
+  	stream = GULP.src(PATHS.glyphicons)
+  	  .pipe(GULP.dest('dist/dev/fonts/bootstrap'))
+  }  
+  return stream;
 });
 
 // Prep fonticon Sass
@@ -307,30 +335,28 @@ GULP.task('sass:fonticon:prep', function(done) {
 });
 
 // Compile fonticon Sass into CSS
-GULP.task('sass:fonticon:build', function() {
+GULP.task('sass:fonticon:compile', function() {
   var stream;
   if(FONT_ICONS){
     stream = GULP.src('tmp/fonticons/css/*.css')
       .pipe($.sourcemaps.init())
       .pipe($.concat('fonticon.css'))
-      .pipe(POSTCSS([ require('postcss-normalize-charset') ]))
+      .pipe(POSTCSS(CSS_PROCESS))
       .pipe($.sourcemaps.write())
-      .pipe(GULP.dest('dist/sources/css'));
+      .pipe(GULP.dest('dist/dev/css'));
   }
   return stream;
 });
 
+// Create fonticon CSS source file for production build
+GULP.task('sass:fonticon:build', function() {
+  return GULP.src('dist/dev/css/fonticon.css')
+    .pipe(GULP.dest('dist/sources/css'));
+});
+
 // Minify fonticon CSS file for production build
 GULP.task('sass:fonticon:minify', function() {
-  var uncss = $.uncss({
-    html: ['src/**/*.html'],
-    ignore: [
-      new RegExp('^meta\..*'),
-      new RegExp('^\.is-.*')
-    ]
-  });
   return GULP.src('dist/sources/css/fonticon.css')
-    .pipe(uncss)
     .pipe($.cssnano())
     .pipe(SWAP_TEXT('*/', '*/\n'))
     .pipe(EXT_NAME('.min.css'))
@@ -352,7 +378,11 @@ GULP.task('javascript', function(done) {
   if(PRODUCTION){
     SEQUENCE(
       ['javascript:init'], 
-      ['javascript:minify:main', 'javascript:minify:jquery', 'javascript:minify:plugin'], 
+      ['javascript:compile'], 
+      ['javascript:minify:main'], 
+      ['javascript:minify:jquery'], 
+      ['javascript:minify:migrate'], 
+      ['javascript:minify:plugin'], 
     done);
   } else {
     SEQUENCE('javascript:init', done);
@@ -362,60 +392,66 @@ GULP.task('javascript', function(done) {
 // Build various JS files
 GULP.task('javascript:init', function() {
   var stream = ES.concat(
-    GULP.src('src/assets/js/bootstrap.js')
-      .pipe($.sourcemaps.init())
-      .pipe($.concat('main.js'))
-      .pipe($.sourcemaps.write())
-      .pipe(GULP.dest(JS_SRC)),   
-    GULP.src(PATHS.javascript_plugin)
+    GULP.src('src/components/bootstrap-sass/assets/javascripts/bootstrap.js')
+      .pipe($.rename('main.js'))
+      .pipe(GULP.dest(JS_DEV)),   
+    GULP.src(PATHS.js_plugins)
       .pipe($.sourcemaps.init())
       .pipe($.concat('plugin.js'))
       .pipe($.sourcemaps.write())
-      .pipe(GULP.dest(JS_SRC)),
-    GULP.src('bower_components/jquery/dist/jquery.js')
-      .pipe(GULP.dest(JS_SRC))
+      .pipe(GULP.dest(JS_DEV)),
+    GULP.src(PATHS.demo_js)
+      .pipe($.sourcemaps.init())
+      .pipe($.concat('demo.js'))
+      .pipe($.sourcemaps.write())
+      .pipe(GULP.dest(JS_DEV)),
+    GULP.src('src/components/jquery-' + JQ_VER + '/index.js')
+      .pipe($.rename('jquery.js'))
+      .pipe(GULP.dest(JS_DEV)),
+    GULP.src('src/components/jquery-migrate-' + JQ_MIG + '/index.js')
+      .pipe($.rename('jquery-migrate.js'))
+      .pipe(GULP.dest(JS_DEV))
   );  
   return stream;
 });
 
+// Create misc JS source file for production build
+GULP.task('javascript:compile', function() {
+  return GULP.src(JS_DEV + '/**/*')
+    .pipe(GULP.dest(JS_SRC));
+});
+
+
 // Minify "main" JS file for production build
 GULP.task('javascript:minify:main', function() {
-  var uglify = $.uglify()
-    .on('error', function(e) {
-      console.log(e);
-  });
   return GULP.src(JS_SRC + '/main.js')
-    .pipe(uglify)
-    .pipe(SWAP_TEXT('*/', '*/\n'))
+    .pipe(UGLIFY({preserveComments:"license"}))
     .pipe(SWAP_TEXT('/*', '\n\n/*'))
+    .pipe(SWAP_TEXT('\n\n/*!', '/*!'))
     .pipe(EXT_NAME(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
 
 // Minify "jquery" JS file for production build
 GULP.task('javascript:minify:jquery', function() {
-  var uglify = $.uglify()
-    .on('error', function(e) {
-      console.log(e);
-  });
   return GULP.src(JS_SRC + '/jquery.js')
-    .pipe(uglify)
-    .pipe(SWAP_TEXT('*/', '*/\n'))
-    .pipe(SWAP_TEXT('/*', '\n\n/*'))
+    .pipe(UGLIFY({preserveComments:"license"}))
+    .pipe(EXT_NAME(JS_EXT))
+    .pipe(GULP.dest(JS_DIST));
+});
+
+// Minify "jquery-migrate" JS file for production build
+GULP.task('javascript:minify:migrate', function() {
+  return GULP.src(JS_SRC + '/jquery-migrate.js')
+    .pipe(UGLIFY({preserveComments:"license"}))
     .pipe(EXT_NAME(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
 
 // Minify "plugin" JS file for production build
 GULP.task('javascript:minify:plugin', function() {
-  var uglify = $.uglify()
-    .on('error', function(e) {
-      console.log(e);
-  });
   return GULP.src(JS_SRC + '/plugin.js')
-    .pipe(uglify)
-    .pipe(SWAP_TEXT('*/', '*/\n'))
-    .pipe(SWAP_TEXT('/*', '\n\n/*'))
+    .pipe(UGLIFY({preserveComments:"license"}))
     .pipe(EXT_NAME(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
@@ -440,25 +476,25 @@ GULP.task('images', function() {
 GULP.task('copy', function(done) {
   if(PRODUCTION && FONT_ICONS){
     SEQUENCE(
-      ['copy:src', 'copy:font:src'], 
+      ['copy:dev', 'copy:font:dev'], 
       ['copy:dist', 'copy:font:dist'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
     SEQUENCE(
-      ['copy:src', 'copy:font:src'], 
+      ['copy:dev', 'copy:font:dev'], 
     done);
   } else if(PRODUCTION && !FONT_ICONS){
-    SEQUENCE('copy:src', 'copy:dist', done);
+    SEQUENCE('copy:dev', 'copy:dist', done);
   } else {
-    SEQUENCE('copy:src', done);
+    SEQUENCE('copy:dev', done);
   }
 });
 
 // Copy assets to "dist/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:src', function() {
+GULP.task('copy:dev', function() {
   return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('dist/sources'));
+    .pipe(GULP.dest('dist/dev'));
 });
 
 // Copy assets to "dist/production" for production build
@@ -470,10 +506,10 @@ GULP.task('copy:dist', function() {
 
 // Copy assets to "dist/sources" 
 // Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:font:src', function() {
+GULP.task('copy:font:dev', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
-    .pipe(GULP.dest('dist/sources/fonts'));
+    .pipe(GULP.dest('dist/dev/fonts'));
 });
 
 // Copy assets to "dist/production" for production build
