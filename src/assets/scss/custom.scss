@@ -1,9 +1,9 @@
 @charset 'utf-8';
 
 // Override Core Variables
-@import "components/bootstrap_themes/paper/variables";
+@import "components/bootstrap_theme/variables";
 @import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
 
 // CSS Overrides
-@import "components/bootstrap_themes/paper/bootswatch";
-@import "components/bootstrap_themes/paper/extras";
+@import "components/bootstrap_theme/bootswatch";
+@import "components/bootstrap_theme/overrides";
