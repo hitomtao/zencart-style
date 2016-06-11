@@ -5,7 +5,7 @@
 
 /*******************************
   ****************************
-  * 01: INITIALISE
+  * 01: SET CONSTANTS
   ****************************
 ********************************/
 const $              = require('gulp-load-plugins')();
@@ -92,7 +92,7 @@ const PATHS = {
 
 /*******************************
   ****************************
-  * 02: MAIN PROCESSES
+  * 02: MAIN BUILD TASK
   ****************************
 ********************************/
 // Build the site
@@ -103,6 +103,11 @@ GULP.task('build', function(done) {
   done);
 });
 
+/*******************************
+  ****************************
+  * 03: LIVERELOAD SERVER
+  ****************************
+********************************/
 // Start a server with LiveReload to preview the site
 GULP.task('server', ['build'], function() {
   BROWSER.init({
@@ -112,7 +117,7 @@ GULP.task('server', ['build'], function() {
 
 /*******************************
   ****************************
-  * 03: PREP FOLDERS
+  * 04: PREP FOLDERS
   ****************************
 ********************************/
 // Remove the "dist" folder if it exists
@@ -122,7 +127,7 @@ GULP.task('clean:dist', function(done) {
 
 /*******************************
   ****************************
-  * 04: BUILD HTML FILES
+  * 05: BUILD HTML FILES
   ****************************
 ********************************/
 // HTML build dispatcher
@@ -184,7 +189,7 @@ GULP.task('pages:regen', function(done) {
 
 /*******************************
   ****************************
-  * 05: BUILD CSS FILES
+  * 06: BUILD CSS FILES
   ****************************
 ********************************/
 // CSS build dispatcher
@@ -320,7 +325,7 @@ GULP.task('sass:regen', function(done) {
 
 /*******************************
   ****************************
-  * 06: BUILD JAVASCRIPT FILES
+  * 07: BUILD JAVASCRIPT FILES
   ****************************
 ********************************/
 // JS build dispatcher
@@ -402,7 +407,7 @@ GULP.task('javascript:minify:plugin', function() {
 
 /*******************************
   ****************************
-  * 07: PROCESS IMAGE FILES
+  * 08: PROCESS IMAGE FILES
   ****************************
 ********************************/
 // Copy image files to the "dist" folder
@@ -413,7 +418,7 @@ GULP.task('images', function() {
 
 /*******************************
   ****************************
-  * 08: COPY ASSESTS
+  * 09: COPY ASSESTS
   ****************************
 ********************************/
 // Dispatcher to copy assets from "src/assets" folder
@@ -465,7 +470,7 @@ GULP.task('copy:font:dist', function() {
 
 /*******************************
   ****************************
-  * 09: DEFAULT TASK
+  * 10: DEFAULT TASK
   ****************************
 ********************************/
 // Build the site, run the server, and watch for file changes
