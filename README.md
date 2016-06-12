@@ -1,27 +1,30 @@
 # Style Zencart
-Bootstrap Based CSS and JS for [ZENCART](http://http://www.zen-cart.com) E-Commerce
+Bootstrap Based CSS and JS for [ZENCART  E-Commerce](http://http://www.zen-cart.com).
 
 ## Introduction
 
 This is a template for generating CSS and JS files for ZENCART using Bootstrap.
 
-The template is based on the [Bootswatch] (https://github.com/thomaspark/bootswatch) and is released under the [MIT License] (https://github.com/dakanji/style-zencart/blob/master/LICENSE)
+The template is based on [Bootswatch] (https://github.com/thomaspark/bootswatch) by Thomas Park and is released under the [MIT License] (https://github.com/dakanji/zencart_style/blob/master/LICENSE)
 
 It comes with a [Gulp] (http://gulpjs.com/) powered build system with:
+- Built-in BrowserSync server
+- Handlebars HTML templating
 - Sass compilation and prefixing
 - JavaScript concatenation
-- Built-in BrowserSync server
-- For production builds:
-  - CSS compression
-  - JavaScript compression
-  - Image compression
+- CSS auto-prefixing
+
+For production builds:
+- Image compression
+- JavaScript minification
+- CSS minification
 
 ## Prerequisites
 
 You will need to have the following utilities installed to use this template:
 
 - [Git](https://git-scm.com/)
-- [NodeJS](https://nodejs.org/en/) (0.10 or greater)
+- [NodeJS](https://nodejs.org/en/)
 - [Bower](https://bower.io/)
 
 ## Setup
@@ -29,15 +32,15 @@ You will need to have the following utilities installed to use this template:
 To set up the template, first clone this repository using your favourite Git agent or manually:
 
 ```bash
-cd /local/path/to/style-zencart
-git clone https://github.com/dakanji/style-zencart style-zencart
+cd /local/path/to/zencart_style
+git clone https://github.com/dakanji/zencart_style zencart_style
 ```
 
 If you wish to contribute to this project, clone the fork using your favourite Git agent or manually:
 
 ```bash
-cd /local/path/to/style-zencart
-git clone https://github.com/YOUR_GITHUB_USERNAME/style-zencart style-zencart
+cd /local/path/to/zencart_style
+git clone https://github.com/YOUR_GITHUB_USERNAME/zencart_style zencart_style
 ```
 
 
@@ -45,7 +48,7 @@ git clone https://github.com/YOUR_GITHUB_USERNAME/style-zencart style-zencart
 Then open the folder in your command line, and install the needed dependencies:
 
 ```bash
-cd /local/path/to/style-zencart
+cd /local/path/to/zencart_style
 npm install && bower install
 ```
 
@@ -59,4 +62,4 @@ When you are done, press `CTRL C` to stop the livereload process and run `npm ru
 
 If you created a fork earlier, you can push your production changes to your fork and then create a pull request with your changes. 
 
-You can read more about contributing to ZENCART about contributing [HERE] (http://docs.zen-cart.com/Contributing/main).
+See [HERE] (http://docs.zen-cart.com/Contributing/main) for more about contributing to ZENCART.
