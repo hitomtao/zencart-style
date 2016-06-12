@@ -1,0 +1,238 @@
+body {
+  padding-top: 50px;
+  > .navbar {
+    -webkit-transition: background-color .3s ease-in;
+    transition: background-color 0.3s ease-in;
+  }
+}
+#home {
+    padding-top: 0;
+    .navbar-brand {
+    	padding: 13.5px 15px 12.5px
+    }
+    .navbar-brand>img {
+    	display: inline;
+    	margin: 0 10px;
+    	height: 100%
+    }
+}
+
+#banner {
+    min-height: 300px;
+    border-bottom: none
+}
+.table-of-contents {
+    margin-top: 1em
+}
+.page-header h1 {
+    font-size: 4em
+}
+.nav-tabs {
+    margin-bottom: 15px
+}
+.progress {
+    margin-bottom: 10px
+}
+footer {
+  margin: 5em 0;
+  li {
+    float: left;
+    margin-right: 1.5em;
+    margin-bottom: 1.5em;
+  }
+  p {
+    clear: left;
+    margin-bottom: 0;
+  }
+}
+@media (max-width: 767px) {
+    .section-preview .image img {
+        width: 100%
+    }
+}
+@media (max-width: 767px) {
+    .splash {
+        padding-top: 4em
+    }
+    .splash .logo {
+        width: 100px
+    }
+    .splash h1 {
+        font-size: 2em
+    }
+    #banner {
+        margin-bottom: 2em;
+        text-align: center
+    }
+}
+
+@media (min-width: 768px) {
+    body>.navbar-transparent {
+        background-color: transparent
+    }
+    body>.navbar-transparent .navbar-nav>.open>a {
+        background-color: transparent!important
+    }
+}
+
+@media (max-width: $screen-xs-max) {
+  body { 
+    padding-top: 0px; 
+  }
+  table.responsive,
+  table.responsive th,
+  table.responsive td,
+  table.responsive tr,
+  table.responsive tbody { 
+   display: block; 
+  }
+  table.responsive tr { 
+    border: 1px solid $gray-lighter; 
+    margin-bottom: 10px; 
+  }
+  table.responsive td { 
+    border: none; 
+    border-bottom: 1px solid $gray-light; 
+    position: relative; padding-left: 50%; 
+  }
+  table.responsive td:before { 
+    width: 40%; 
+    padding-right: 10px; 
+    text-align: left; 
+    word-wrap: break-word; 
+  }
+  table.responsive td:before { 
+    content: attr(data-content); 
+    height: 50px; 
+  }
+  table.responsive td.small-padding { 
+    padding-top: 5px; 
+    padding-bottom: 5px; 
+  }
+  table.responsive td.medium-padding { 
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+  }
+  table.responsive td.large-padding { 
+    padding-top: 25px; 
+    padding-bottom: 25px; 
+  }
+  table.responsive tbody tr td:first-child { 
+    background: $gray; 
+    color: #fff; 
+  } 
+  table.responsive thead { 
+    display: none; 
+  }
+}
+
+@media (min-width: $screen-md-min) {
+  body > .navbar-transparent {
+    background-color: transparent;
+    .navbar-nav > .open > a {
+      background-color: transparent !important;
+    }
+  }
+}
+
+textarea {
+  width: 100%;
+}
+
+div.reportBox {
+    background: $gray-lighter;
+    border: 1px solid $gray-lighter;
+    margin-top: 1em;
+}
+
+.reportBox {
+	div.row {
+		background: $gray-faint;
+		clear: both;
+		margin-top: 1px;
+		padding: 3px;
+		margin: 0px;
+	}
+	div.row:nth-of-type(2n) {
+		background-color: $gray-fainter;
+	}
+	div.row span.center {
+		margin-right: 30px;
+	}
+	div.row span.left {
+		float: left;
+		text-align: left;
+		width: 74%;
+	}
+	div.row span.right {
+		float: right;
+		text-align: right;
+		width: 34%;
+	}
+}
+
+.inputwrapper {
+  margin:5px 0;
+  padding:3px;
+}
+
+.copyrightrow {
+    clear: both;
+    font-size: 9px;
+    padding: 25px;
+    text-align: center; 
+} 
+
+.nav-home {
+  padding-top: 0;
+  .navbar-brand {
+    padding: 13.5px 15px 12.5px;
+    > img {
+      display: inline;
+      margin: 0 10px;
+      height: 100%;
+    }
+  }
+}
+
+.page-banner {
+  min-height: 300px;
+  border-bottom: none;
+}
+
+.table-of-contents {
+  margin-top: 1em;
+}
+
+.page-header h1 {
+  font-size: 4em;
+}
+
+.bs-tips {
+  position: relative;
+  .modal {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    z-index: 1;
+    display: block;
+  }
+  .modal-dialog {
+    width: 90%;
+  }
+  .popover {
+    position: relative;
+    display: inline-block;
+    width: 220px;
+    margin: 20px;
+  }
+}
+
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  outline: none !important; 
+} 
