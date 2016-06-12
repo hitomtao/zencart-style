@@ -24,8 +24,8 @@ For production builds:
 You will need to have the following utilities installed to use this template:
 
 - [Git](https://git-scm.com/)
-- [NodeJS](https://nodejs.org/en/)
 - [Bower](https://bower.io/)
+- [NodeJS](https://nodejs.org/en/)
 
 ## Setup
 
@@ -62,4 +62,4 @@ When you are done, press `CTRL C` to stop the livereload process and run `npm ru
 
 If you created a fork earlier, you can push your production changes to your fork and then create a pull request with your changes. 
 
-See [HERE] (http://docs.zen-cart.com/Contributing/main) for more about contributing to ZENCART.
+See the ZENCART guide to contributing to the project at this [LINK] (http://docs.zen-cart.com/Contributing/main).
