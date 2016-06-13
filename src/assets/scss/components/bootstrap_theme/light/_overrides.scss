@@ -5,13 +5,45 @@ body {
     transition: background-color 0.3s ease-in;
   }
 }
-
 button,
 html input[type="button"],
 input[type="reset"],
 input[type="submit"] {
   outline: none !important; 
 } 
+
+#home {
+    padding-top: 0;
+    .navbar-brand {
+    	padding: 13.5px 15px 12.5px
+    }
+    .navbar-brand>img {
+    	display: inline;
+    	margin: 0 10px;
+    	height: 100%
+    }
+}
+
+#banner {
+    min-height: 300px;
+    border-bottom: none
+}
+
+.table-of-contents {
+    margin-top: 1em
+}
+
+.page-header h1 {
+    font-size: 4em
+}
+
+.nav-tabs {
+    margin-bottom: 15px
+}
+
+.progress {
+    margin-bottom: 10px
+}
 
 .nav-home {
   padding-top: 0;
@@ -83,32 +115,30 @@ div.reportBox {
     margin-top: 1em;
 }
 
-.reportBox div.row {
-    background: $gray-faint;
-    clear: both;
-    margin-top: 1px;
-    padding: 3px;
-    margin: 0px;
-}
-
-.reportBox div.row:nth-of-type(2n) {
-    background-color: $gray-fainter;
-}
-
-.reportBox div.row span.center {
-    margin-right: 30px;
-}
-
-.reportBox div.row span.left {
-    float: left;
-    text-align: left;
-    width: 74%;
-}
-
-.reportBox div.row span.right {
-    float: right;
-    text-align: right;
-    width: 34%;
+.reportBox {
+	div.row {
+		background: $gray-faint;
+		clear: both;
+		margin-top: 1px;
+		padding: 3px;
+		margin: 0px;
+	}
+	div.row:nth-of-type(2n) {
+		background-color: $gray-fainter;
+	}
+	div.row span.center {
+		margin-right: 30px;
+	}
+	div.row span.left {
+		float: left;
+		text-align: left;
+		width: 74%;
+	}
+	div.row span.right {
+		float: right;
+		text-align: right;
+		width: 34%;
+	}
 }
 
 .inputwrapper {
@@ -122,6 +152,15 @@ div.reportBox {
     padding: 25px;
     text-align: center; 
 } 
+
+@media (min-width: $screen-sm-min) {
+    body>.navbar-transparent {
+        background-color: transparent
+    }
+    body>.navbar-transparent .navbar-nav>.open>a {
+        background-color: transparent!important
+    }
+}
 
 @media (max-width: $screen-xs-max) {
   body { 

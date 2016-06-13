@@ -5,6 +5,13 @@ body {
     transition: background-color 0.3s ease-in;
   }
 }
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  outline: none !important; 
+} 
+
 #home {
     padding-top: 0;
     .navbar-brand {
@@ -21,18 +28,70 @@ body {
     min-height: 300px;
     border-bottom: none
 }
+
 .table-of-contents {
     margin-top: 1em
 }
+
 .page-header h1 {
     font-size: 4em
 }
+
 .nav-tabs {
     margin-bottom: 15px
 }
+
 .progress {
     margin-bottom: 10px
 }
+
+.nav-home {
+  padding-top: 0;
+  .navbar-brand {
+    padding: 13.5px 15px 12.5px;
+    > img {
+      display: inline;
+      margin: 0 10px;
+      height: 100%;
+    }
+  }
+}
+
+.page-banner {
+  min-height: 300px;
+  border-bottom: none;
+}
+
+.table-of-contents {
+  margin-top: 1em;
+}
+
+.page-header h1 {
+  font-size: 4em;
+}
+
+.bs-tips {
+  position: relative;
+  .modal {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    z-index: 1;
+    display: block;
+  }
+  .modal-dialog {
+    width: 90%;
+  }
+  .popover {
+    position: relative;
+    display: inline-block;
+    width: 220px;
+    margin: 20px;
+  }
+}
+
 footer {
   margin: 5em 0;
   li {
@@ -45,28 +104,56 @@ footer {
     margin-bottom: 0;
   }
 }
-@media (max-width: 767px) {
-    .section-preview .image img {
-        width: 100%
-    }
-}
-@media (max-width: 767px) {
-    .splash {
-        padding-top: 4em
-    }
-    .splash .logo {
-        width: 100px
-    }
-    .splash h1 {
-        font-size: 2em
-    }
-    #banner {
-        margin-bottom: 2em;
-        text-align: center
-    }
+    
+textarea {
+  width: 100%;
 }
 
-@media (min-width: 768px) {
+div.reportBox {
+    background: $gray-lighter;
+    border: 1px solid $gray-lighter;
+    margin-top: 1em;
+}
+
+.reportBox {
+	div.row {
+		background: $gray-faint;
+		clear: both;
+		margin-top: 1px;
+		padding: 3px;
+		margin: 0px;
+	}
+	div.row:nth-of-type(2n) {
+		background-color: $gray-fainter;
+	}
+	div.row span.center {
+		margin-right: 30px;
+	}
+	div.row span.left {
+		float: left;
+		text-align: left;
+		width: 74%;
+	}
+	div.row span.right {
+		float: right;
+		text-align: right;
+		width: 34%;
+	}
+}
+
+.inputwrapper {
+  margin:5px 0;
+  padding:3px;
+}
+
+.copyrightrow {
+    clear: both;
+    font-size: 9px;
+    padding: 25px;
+    text-align: center; 
+} 
+
+@media (min-width: $screen-sm-min) {
     body>.navbar-transparent {
         background-color: transparent
     }
@@ -134,105 +221,3 @@ footer {
     }
   }
 }
-
-textarea {
-  width: 100%;
-}
-
-div.reportBox {
-    background: $gray-lighter;
-    border: 1px solid $gray-lighter;
-    margin-top: 1em;
-}
-
-.reportBox {
-	div.row {
-		background: $gray-faint;
-		clear: both;
-		margin-top: 1px;
-		padding: 3px;
-		margin: 0px;
-	}
-	div.row:nth-of-type(2n) {
-		background-color: $gray-fainter;
-	}
-	div.row span.center {
-		margin-right: 30px;
-	}
-	div.row span.left {
-		float: left;
-		text-align: left;
-		width: 74%;
-	}
-	div.row span.right {
-		float: right;
-		text-align: right;
-		width: 34%;
-	}
-}
-
-.inputwrapper {
-  margin:5px 0;
-  padding:3px;
-}
-
-.copyrightrow {
-    clear: both;
-    font-size: 9px;
-    padding: 25px;
-    text-align: center; 
-} 
-
-.nav-home {
-  padding-top: 0;
-  .navbar-brand {
-    padding: 13.5px 15px 12.5px;
-    > img {
-      display: inline;
-      margin: 0 10px;
-      height: 100%;
-    }
-  }
-}
-
-.page-banner {
-  min-height: 300px;
-  border-bottom: none;
-}
-
-.table-of-contents {
-  margin-top: 1em;
-}
-
-.page-header h1 {
-  font-size: 4em;
-}
-
-.bs-tips {
-  position: relative;
-  .modal {
-    position: relative;
-    top: auto;
-    right: auto;
-    left: auto;
-    bottom: auto;
-    z-index: 1;
-    display: block;
-  }
-  .modal-dialog {
-    width: 90%;
-  }
-  .popover {
-    position: relative;
-    display: inline-block;
-    width: 220px;
-    margin: 20px;
-  }
-}
-
-button,
-html input[type="button"],
-input[type="reset"],
-input[type="submit"] {
-  outline: none !important; 
-} 
