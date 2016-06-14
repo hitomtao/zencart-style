@@ -420,6 +420,8 @@ GULP.task('javascript:minify:migrate', function() {
 GULP.task('javascript:minify:plugin', function() {
   return GULP.src(JS_SRC + '/plugin.js')
     .pipe(UGLIFY({preserveComments:"license"}))
+    .pipe(SWAP_TEXT('/*', '\n\n/*'))
+    .pipe(SWAP_TEXT('\n\n/*!', '/*!'))
     .pipe(EXT_NAME(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });

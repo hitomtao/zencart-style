@@ -44,9 +44,6 @@
 		$("#source-modal").modal();
 	});
 	
-	$('.bs-tips [data-toggle="popover"]').popover();
-	$('.bs-tips [data-toggle="tooltip"]').tooltip();
-	
 	$(".bs-component").hover(function(){
 		$(this).append($button);
 		$button.show();
