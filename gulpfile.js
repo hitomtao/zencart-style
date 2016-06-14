@@ -68,6 +68,9 @@ const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<scri
 
 // File paths to various assets are defined here.
 const PATHS = {
+  demo_js: [
+    'src/assets/js/demopage/**/*.js'
+  ],
   assets: [
     'src/assets/**/*',
     '!src/assets/{img,js,scss}/**/*',
@@ -77,9 +80,6 @@ const PATHS = {
   js_plugins: [
     'src/assets/js/**/*.js',
     '!src/assets/js/demopage/**/*.js'
-  ],
-  demo_js: [
-    'src/assets/js/demopage/**/*.js'
   ],
   sass_fonticon_include: [
     FONT_SASS,
@@ -248,7 +248,7 @@ GULP.task('sass:main:minify', function() {
 });
 
 // Compile custom Sass into CSS
-GULP.task('sass:custom:compile', function() {
+GULP.task('sass:custom:compile', ['sass:demo:compile'], function() {
 	
   var destinations = [];
   if (!PRODUCTION) { destinations.push( GULP.dest('dist/dev/css') ); }
@@ -264,6 +264,25 @@ GULP.task('sass:custom:compile', function() {
     }))
     .pipe($.sourcemaps.write())
     .pipe(MULTISTREAM.apply(undefined, destinations));
+});
+
+// Compile demo Sass into CSS
+GULP.task('sass:demo:compile', function() {
+
+	var stream;
+	  if (!PRODUCTION) {
+	  	stream = GULP.src('src/assets/scss/demo.scss')
+	  	  .pipe($.sourcemaps.init())
+	  	  .pipe($.sass()
+	  	    .on('error', $.sass.logError))
+	  	  .pipe($.postcss(CSS_PROCESS))
+	  	  .pipe($.autoprefixer({
+	  	  	browsers: COMPATIBILITY
+	  	  }))
+	  	  .pipe($.sourcemaps.write())
+	  	  .pipe(GULP.dest('dist/dev/css'));
+	  }
+	return stream;
 });
 
 // Minify custom CSS file for production build
