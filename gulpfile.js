@@ -15,7 +15,6 @@ const REMOVE         = require('del');
 const PANINI         = require('panini');
 const EVENTS         = require('event-stream');
 const BROWSER        = require('browser-sync');
-const SEQUENCE       = require('run-sequence');
 const CSS_PROCESS    = [
   require('postcss-normalize-charset'),
   require('postcss-remove-prefixes'), 
@@ -90,7 +89,7 @@ const PATHS = {
 ********************************/
 // Build the site
 GULP.task('build', function(done) {
-  SEQUENCE(
+  $.sequence(
     ['clean:dist'], 
     ['pages', 'sass', 'javascript', 'images', 'copy'], 
   done);
@@ -172,12 +171,12 @@ GULP.task('pages', function(done) {
 // Rebuild HTML files
 GULP.task('pages:reset', function(done) {
   PANINI.refresh();
-  SEQUENCE('pages:regen', done);
+  $.sequence('pages:regen', done);
 });
 
 // Rebuild HTML files
 GULP.task('pages:regen', function(done) {
-  SEQUENCE(['pages', 'sass'], done);
+  $.sequence(['pages', 'sass'], done);
 });
 
 /*******************************
@@ -188,25 +187,25 @@ GULP.task('pages:regen', function(done) {
 // CSS build dispatcher
 GULP.task('sass', function(done) {
   if(PRODUCTION && FONT_ICONS){
-    SEQUENCE(
+    $.sequence(
       ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
       ['sass:main:minify', 'sass:fonticon:compile'], 
       ['sass:custom:minify'],
       ['sass:fonticon:minify'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
-    SEQUENCE(
+    $.sequence(
       ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
       ['sass:fonticon:compile'], 
     done);
   } else if(PRODUCTION && !FONT_ICONS){
-    SEQUENCE(
+    $.sequence(
       ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
       ['sass:main:minify'], 
       ['sass:custom:minify'], 
     done);
   } else {
-    SEQUENCE(
+    $.sequence(
       ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
     done);
   }
@@ -332,7 +331,7 @@ GULP.task('sass:fonticon:minify', function() {
 
 // Rebuild scss files
 GULP.task('sass:regen', function(done) {
-  SEQUENCE('sass', done);
+  $.sequence('sass', done);
 });
 
 /*******************************
@@ -343,7 +342,7 @@ GULP.task('sass:regen', function(done) {
 // JS build dispatcher
 GULP.task('javascript', function(done) {
   if(PRODUCTION){
-    SEQUENCE(
+    $.sequence(
       ['javascript:compile'], 
       ['javascript:minify:main'], 
       ['javascript:minify:jquery'], 
@@ -351,7 +350,7 @@ GULP.task('javascript', function(done) {
       ['javascript:minify:plugin'], 
     done);
   } else {
-    SEQUENCE('javascript:compile', done);
+    $.sequence('javascript:compile', done);
   }
 });
 
@@ -438,17 +437,17 @@ GULP.task('images', function() {
 // Dispatcher to copy assets from "src/assets" folder
 GULP.task('copy', function(done) {
   if(PRODUCTION && FONT_ICONS){
-    SEQUENCE(
+    $.sequence(
       ['copy:dist', 'copy:font:dist'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
-    SEQUENCE(
+    $.sequence(
       ['copy:dev', 'copy:font:dev'], 
     done);
   } else if(PRODUCTION && !FONT_ICONS){
-    SEQUENCE('copy:dist', done);
+    $.sequence('copy:dist', done);
   } else {
-    SEQUENCE('copy:dev', done);
+    $.sequence('copy:dev', done);
   }
 });
 
