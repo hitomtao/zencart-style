@@ -125,8 +125,15 @@ input[type="submit"] {
   outline: none !important; 
 } 
 
-.page-header h1 {
+.page-header h1, 
+.page-header-noborder h1 {
   font-size: 4em;
+}
+
+.page-header-noborder {
+  border: 0;
+  margin: 46px 0 23px;
+  padding-bottom: 10.5px; 
 }
 
 div.reportBox {
