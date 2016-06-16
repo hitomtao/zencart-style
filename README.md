@@ -1,4 +1,4 @@
-# Style Zencart
+# Zencart Style
 Bootstrap Based CSS and JS for [ZENCART  E-Commerce](http://http://www.zen-cart.com).
 
 ## Introduction

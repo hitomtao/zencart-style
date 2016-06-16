@@ -1,5 +1,5 @@
 {
-  "name": "style-zencart",
+  "name": "zencart_style",
   "version": "1.0.0",
   "description": "Bootstrap Based CSS and JS for Zencart",
   "main": "gulpfile.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dakanji/style-zencart.git"
+    "url": "git+https://github.com/dakanji/zencart_style.git"
   },
   "keywords": [
     "Bootstrap",
@@ -19,9 +19,9 @@
   "author": "Dayo Akanji <dakanji@users.nopely.github.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dakanji/style-zencart/issues"
+    "url": "https://github.com/dakanji/zencart_style/issues"
   },
-  "homepage": "https://github.com/dakanji/style-zencart#readme",
+  "homepage": "https://github.com/dakanji/zencart_style#readme",
   "devDependencies": {
     "browser-sync": "^2.13.0",
     "css-declaration-sorter": "^1.4.0",
