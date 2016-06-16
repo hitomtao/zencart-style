@@ -9,20 +9,13 @@
   ****************************
 ********************************/
 const $              = require('gulp-load-plugins')();
-const ARGV           = require('yargs').argv;
-const BROWSER        = require('browser-sync');
-const GULP           = require('gulp');
-const PANINI         = require('panini');
-const REMOVE         = require('del');
-const SEQUENCE       = require('run-sequence');
 const ES             = require('event-stream');
-const EXT_NAME       = require('gulp-extname');
-const SWAP_HTML      = require('gulp-html-replace');
-const ADD_STRING     = require('gulp-inject-string');
-const SWAP_TEXT      = require('gulp-replace');
-const UGLIFY         = require('gulp-uglify');
-const MULTISTREAM    = require('gulp-multistream');
-
+const GULP           = require('gulp');
+const ARGV           = require('yargs').argv;
+const REMOVE         = require('del');
+const PANINI         = require('panini');
+const BROWSER        = require('browser-sync');
+const SEQUENCE       = require('run-sequence');
 const CSS_PROCESS    = [
   require('postcss-normalize-charset'),
   require('postcss-remove-prefixes'), 
@@ -150,7 +143,7 @@ GULP.task('pages', function(done) {
   if(!FONT_ICONS){
     fonticon_css = '';
   }
-  var replace_html = SWAP_HTML({
+  var replace_html = $.htmlReplace({
     'jquery_js': jquery_js,
     'jquery_fallback': JQ_WRITE,
     'jquery_migrate_js': jquery_migrate_js,
@@ -235,15 +228,15 @@ GULP.task('sass:main:compile', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe(MULTISTREAM.apply(undefined, destinations));
+    .pipe($.multistream.apply(undefined, destinations));
 });
 
 // Minify main CSS file for production build
 GULP.task('sass:main:minify', function() {
   return GULP.src('dist/sources/css/main.css')
     .pipe($.cssnano())
-    .pipe(SWAP_TEXT('*/', '*/\n'))
-    .pipe(EXT_NAME('.min.css'))
+    .pipe($.replace('*/', '*/\n'))
+    .pipe($.extname('.min.css'))
     .pipe(GULP.dest('dist/production/css'));
 });
 
@@ -263,7 +256,7 @@ GULP.task('sass:custom:compile', ['sass:demo:compile'], function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe(MULTISTREAM.apply(undefined, destinations));
+    .pipe($.multistream.apply(undefined, destinations));
 });
 
 // Compile demo Sass into CSS
@@ -289,8 +282,8 @@ GULP.task('sass:demo:compile', function() {
 GULP.task('sass:custom:minify', function() {
   return GULP.src('dist/sources/css/custom.css')
     .pipe($.cssnano())
-    .pipe(SWAP_TEXT('*/', '*/\n'))
-    .pipe(EXT_NAME('.min.css'))
+    .pipe($.replace('*/', '*/\n'))
+    .pipe($.extname('.min.css'))
     .pipe(GULP.dest('dist/production/css'));
 });
 
@@ -302,7 +295,7 @@ GULP.task('sass:glypicons:init', function(done) {
   if (PRODUCTION) { destinations.push( GULP.dest('dist/production/fonts/bootstrap') ); }
 
   return GULP.src(PATHS.glyphicons)
-    .pipe(MULTISTREAM.apply(undefined, destinations));   
+    .pipe($.multistream.apply(undefined, destinations));   
 });
 
 // Prep fonticon Sass
@@ -314,7 +307,7 @@ GULP.task('sass:fonticon:compile', function(done) {
   
   return GULP.src(FONT_SASS + '**/*.scss')
     .pipe($.sourcemaps.init())
-    .pipe(ADD_STRING.prepend("@import 'unit';\n\n"))
+    .pipe($.injectString.prepend("@import 'unit';\n\n"))
     .pipe($.sass({
       includePaths: PATHS.sass_fonticon_include
     }).on('error', $.sass.logError))
@@ -325,15 +318,15 @@ GULP.task('sass:fonticon:compile', function(done) {
     .pipe($.concat('fonticon.css'))
     .pipe($.postcss(CSS_PROCESS))
     .pipe($.sourcemaps.write())
-    .pipe(MULTISTREAM.apply(undefined, destinations));   
+    .pipe($.multistream.apply(undefined, destinations));   
 });
 
 // Minify fonticon CSS file for production build
 GULP.task('sass:fonticon:minify', function() {
   return GULP.src('dist/sources/css/fonticon.css')
     .pipe($.cssnano())
-    .pipe(SWAP_TEXT('*/', '*/\n'))
-    .pipe(EXT_NAME('.min.css'))
+    .pipe($.replace('*/', '*/\n'))
+    .pipe($.extname('.min.css'))
     .pipe(GULP.dest('dist/production/css'));
 });
 
@@ -393,36 +386,36 @@ GULP.task('javascript:compile', function() {
 // Minify "main" JS file for production build
 GULP.task('javascript:minify:main', function() {
   return GULP.src(JS_SRC + '/main.js')
-    .pipe(UGLIFY({preserveComments:"license"}))
-    .pipe(SWAP_TEXT('/*', '\n\n/*'))
-    .pipe(SWAP_TEXT('\n\n/*!', '/*!'))
-    .pipe(EXT_NAME(JS_EXT))
+    .pipe($.uglify({preserveComments:"license"}))
+    .pipe($.replace('/*', '\n\n/*'))
+    .pipe($.replace('\n\n/*!', '/*!'))
+    .pipe($.extname(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
 
 // Minify "jquery" JS file for production build
 GULP.task('javascript:minify:jquery', function() {
   return GULP.src(JS_SRC + '/jquery.js')
-    .pipe(UGLIFY({preserveComments:"license"}))
-    .pipe(EXT_NAME(JS_EXT))
+    .pipe($.uglify({preserveComments:"license"}))
+    .pipe($.extname(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
 
 // Minify "jquery-migrate" JS file for production build
 GULP.task('javascript:minify:migrate', function() {
   return GULP.src(JS_SRC + '/jquery-migrate.js')
-    .pipe(UGLIFY({preserveComments:"license"}))
-    .pipe(EXT_NAME(JS_EXT))
+    .pipe($.uglify({preserveComments:"license"}))
+    .pipe($.extname(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
 
 // Minify "plugin" JS file for production build
 GULP.task('javascript:minify:plugin', function() {
   return GULP.src(JS_SRC + '/plugin.js')
-    .pipe(UGLIFY({preserveComments:"license"}))
-    .pipe(SWAP_TEXT('/*', '\n\n/*'))
-    .pipe(SWAP_TEXT('\n\n/*!', '/*!'))
-    .pipe(EXT_NAME(JS_EXT))
+    .pipe($.uglify({preserveComments:"license"}))
+    .pipe($.replace('/*', '\n\n/*'))
+    .pipe($.replace('\n\n/*!', '/*!'))
+    .pipe($.extname(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
 });
 
