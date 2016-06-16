@@ -9,11 +9,11 @@
   ****************************
 ********************************/
 const $              = require('gulp-load-plugins')();
-const ES             = require('event-stream');
 const GULP           = require('gulp');
 const ARGV           = require('yargs').argv;
 const REMOVE         = require('del');
 const PANINI         = require('panini');
+const EVENTS         = require('event-stream');
 const BROWSER        = require('browser-sync');
 const SEQUENCE       = require('run-sequence');
 const CSS_PROCESS    = [
@@ -359,7 +359,7 @@ GULP.task('javascript', function(done) {
 GULP.task('javascript:compile', function() {
 
   var target_dir = PRODUCTION ? JS_SRC : JS_DEV;
-  var stream = ES.concat(
+  var stream = EVENTS.concat(
     GULP.src('src/components/bootstrap-sass/assets/javascripts/bootstrap.js')
       .pipe($.rename('main.js'))
       .pipe(GULP.dest(target_dir)),   
