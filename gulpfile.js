@@ -35,7 +35,11 @@ const DEV_PORT = 8000;
 const COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
 // Random cache buster
-const CACHEFLAG      = Math.floor(Math.random()*900000) + 100000;
+const CACHEFLAG      = '?' + Math.floor(Math.random()*900000) + 100000;
+
+// JQuery & JQuery Migrate versions
+const JQ_VER = '2.2.4';
+const JQ_MIG = '1.4.1';
 
 // Use additional font icons
 const FONT_ICONS = true;
@@ -47,16 +51,14 @@ const JS_DEV = 'dist/dev/js';
 const JS_SRC = 'dist/sources/js';
 const JS_DIST = 'dist/production/js';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
-const JQ_VER = '2.2.4';
-const JQ_MIG = '1.4.1';
+const CSS_EXT = PRODUCTION ? '.min.css' : '.css';
 const JQ_URI = PRODUCTION ? JS_DIST : JS_DEV;
 const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="' 
         + JQ_URI.replace('dist/','/') + '/jquery' + JS_EXT 
         + '"><\\/script>\');</script>';
 
 const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<script src="' 
-        + JQ_URI.replace('dist/','/') + '/jquery-migrate' + JS_EXT 
-        + '"><\\/script>\');</script>';
+        + '/dev/js/jquery-migrate.js"><\\/script>\');</script>';
 
 // File paths to various assets are defined here.
 const PATHS = {
@@ -124,29 +126,25 @@ GULP.task('clean:dist', function(done) {
 ********************************/
 // HTML build dispatcher
 GULP.task('pages', function(done) {
+  var css_path = PRODUCTION ? '/production/css/' : '/dev/css/';
+  var js_path = PRODUCTION ? '/production/js/' : '/dev/js/';
+  
   var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + '.min.js';
-  var jquery_migrate_js = '//code.jquery.com/jquery-migrate-' + JQ_MIG + '.min.js';
-  var main_js = '/dev/js/main.js?' + CACHEFLAG;
-  var plugin_js = '/dev/js/plugin.js?' + CACHEFLAG;
-  var demo_js = '/dev/js/demo.js?' + CACHEFLAG;
-  var main_css = '/dev/css/main.css?' + CACHEFLAG;
-  var custom_css = '/dev/css/custom.css?' + CACHEFLAG;
-  var fonticon_css = '/dev/css/fonticon.css?' + CACHEFLAG;
-  if(PRODUCTION){
-    main_css = '/production/css/main.min.css?' + CACHEFLAG;
-    main_js = '/production/js/main.min.js?' + CACHEFLAG;
-    custom_css = '/production/css/custom.min.css?' + CACHEFLAG;
-    plugin_js = '/production/js/plugin.min.js?' + CACHEFLAG;
-    fonticon_css = '/production/css/fonticon.min.css?' + CACHEFLAG;
-  }
-  if(!FONT_ICONS){
-    fonticon_css = '';
-  }
+  var jquery_migrate_js = PRODUCTION ? '': '//code.jquery.com/jquery-migrate-' + JQ_MIG + '.min.js';
+  var jquery_migrate_fallback = PRODUCTION ? '': JM_WRITE;
+  var demo_js = '/dev/js/demo.js' + CACHEFLAG;
+  
+  var main_css = css_path + 'main' + CSS_EXT + CACHEFLAG;
+  var main_js = js_path + 'main' + JS_EXT + CACHEFLAG;
+  var custom_css = css_path + 'custom' + CSS_EXT + CACHEFLAG;
+  var plugin_js = js_path + 'plugin' + JS_EXT + CACHEFLAG;
+  var fonticon_css = !FONT_ICONS ? '' : css_path + 'fonticon' + CSS_EXT + CACHEFLAG;
+  
   var replace_html = $.htmlReplace({
     'jquery_js': jquery_js,
     'jquery_fallback': JQ_WRITE,
     'jquery_migrate_js': jquery_migrate_js,
-    'jquery_migrate_fallback': JM_WRITE,
+    'jquery_migrate_fallback': jquery_migrate_fallback,
     'main_js': main_js,
     'plugin_js': plugin_js, 
     'demo_js': demo_js, 
@@ -190,8 +188,7 @@ GULP.task('sass', function(done) {
     $.sequence(
       ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
       ['sass:main:minify', 'sass:fonticon:compile'], 
-      ['sass:custom:minify'],
-      ['sass:fonticon:minify'], 
+      ['sass:custom:minify', 'sass:fonticon:minify'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
     $.sequence(
@@ -201,8 +198,7 @@ GULP.task('sass', function(done) {
   } else if(PRODUCTION && !FONT_ICONS){
     $.sequence(
       ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
-      ['sass:main:minify'], 
-      ['sass:custom:minify'], 
+      ['sass:main:minify', 'sass:custom:minify'], 
     done);
   } else {
     $.sequence(
@@ -214,10 +210,6 @@ GULP.task('sass', function(done) {
 // Compile main Sass into CSS
 GULP.task('sass:main:compile', function() {
 	
-  var destinations = [];
-  if (!PRODUCTION) { destinations.push( GULP.dest('dist/dev/css') ); }
-  if (PRODUCTION) { destinations.push( GULP.dest('dist/sources/css') ); }
-	
   return GULP.src('src/assets/scss/main.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
@@ -227,7 +219,12 @@ GULP.task('sass:main:compile', function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe($.multistream.apply(undefined, destinations));
+    .pipe(
+      $.cond(PRODUCTION, 
+        GULP.dest('dist/sources/css'), 
+        GULP.dest('dist/dev/css')
+      )
+    );
 });
 
 // Minify main CSS file for production build
@@ -242,10 +239,6 @@ GULP.task('sass:main:minify', function() {
 // Compile custom Sass into CSS
 GULP.task('sass:custom:compile', ['sass:demo:compile'], function() {
 	
-  var destinations = [];
-  if (!PRODUCTION) { destinations.push( GULP.dest('dist/dev/css') ); }
-  if (PRODUCTION) { destinations.push( GULP.dest('dist/sources/css') ); }
-	
   return GULP.src('src/assets/scss/custom.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
@@ -255,7 +248,12 @@ GULP.task('sass:custom:compile', ['sass:demo:compile'], function() {
       browsers: COMPATIBILITY
     }))
     .pipe($.sourcemaps.write())
-    .pipe($.multistream.apply(undefined, destinations));
+    .pipe(
+      $.cond(PRODUCTION, 
+        GULP.dest('dist/sources/css'), 
+        GULP.dest('dist/dev/css')
+      )
+    );
 });
 
 // Compile demo Sass into CSS
@@ -289,21 +287,18 @@ GULP.task('sass:custom:minify', function() {
 
 GULP.task('sass:glypicons:init', function(done) {
 	
-  var destinations = [];
-  if (!PRODUCTION) { destinations.push( GULP.dest('dist/dev/fonts/bootstrap') ); }
-  if (PRODUCTION) { destinations.push( GULP.dest('dist/production/fonts/bootstrap') ); }
-
   return GULP.src(PATHS.glyphicons)
-    .pipe($.multistream.apply(undefined, destinations));   
+    .pipe(
+      $.cond(PRODUCTION, 
+        GULP.dest('dist/production/fonts/bootstrap'), 
+        GULP.dest('dist/dev/fonts/bootstrap')
+      )
+    );
 });
 
 // Prep fonticon Sass
 GULP.task('sass:fonticon:compile', function(done) {
 	
-  var destinations = [];
-  if (!PRODUCTION) { destinations.push( GULP.dest('dist/dev/css') ); }
-  if (PRODUCTION) { destinations.push( GULP.dest('dist/sources/css') ); }
-  
   return GULP.src(FONT_SASS + '**/*.scss')
     .pipe($.sourcemaps.init())
     .pipe($.injectString.prepend("@import 'unit';\n\n"))
@@ -317,7 +312,12 @@ GULP.task('sass:fonticon:compile', function(done) {
     .pipe($.concat('fonticon.css'))
     .pipe($.postcss(CSS_PROCESS))
     .pipe($.sourcemaps.write())
-    .pipe($.multistream.apply(undefined, destinations));   
+    .pipe(
+      $.cond(PRODUCTION, 
+        GULP.dest('dist/sources/css'), 
+        GULP.dest('dist/dev/css')
+      )
+    );
 });
 
 // Minify fonticon CSS file for production build
@@ -344,10 +344,7 @@ GULP.task('javascript', function(done) {
   if(PRODUCTION){
     $.sequence(
       ['javascript:compile'], 
-      ['javascript:minify:main'], 
-      ['javascript:minify:jquery'], 
-      ['javascript:minify:migrate'], 
-      ['javascript:minify:plugin'], 
+      ['javascript:minify:main', 'javascript:minify:plugin', 'javascript:minify:jquery'], 
     done);
   } else {
     $.sequence('javascript:compile', done);
@@ -376,8 +373,8 @@ GULP.task('javascript:compile', function() {
       .pipe($.rename('jquery.js'))
       .pipe(GULP.dest(target_dir)),
     GULP.src('src/components/jquery-migrate-' + JQ_MIG + '/index.js')
-      .pipe($.rename('jquery-migrate.js'))
-      .pipe(GULP.dest(target_dir))
+      .pipe( $.cond( !PRODUCTION, $.rename('jquery-migrate.js') ) )
+      .pipe( $.cond( !PRODUCTION, GULP.dest(target_dir) ) )
   );  
   return stream;
 });
@@ -395,14 +392,6 @@ GULP.task('javascript:minify:main', function() {
 // Minify "jquery" JS file for production build
 GULP.task('javascript:minify:jquery', function() {
   return GULP.src(JS_SRC + '/jquery.js')
-    .pipe($.uglify({preserveComments:"license"}))
-    .pipe($.extname(JS_EXT))
-    .pipe(GULP.dest(JS_DIST));
-});
-
-// Minify "jquery-migrate" JS file for production build
-GULP.task('javascript:minify:migrate', function() {
-  return GULP.src(JS_SRC + '/jquery-migrate.js')
     .pipe($.uglify({preserveComments:"license"}))
     .pipe($.extname(JS_EXT))
     .pipe(GULP.dest(JS_DIST));
@@ -436,49 +425,36 @@ GULP.task('images', function() {
 ********************************/
 // Dispatcher to copy assets from "src/assets" folder
 GULP.task('copy', function(done) {
-  if(PRODUCTION && FONT_ICONS){
-    $.sequence(
-      ['copy:dist', 'copy:font:dist'], 
-    done);
-  } else if(!PRODUCTION && FONT_ICONS){
-    $.sequence(
-      ['copy:dev', 'copy:font:dev'], 
-    done);
-  } else if(PRODUCTION && !FONT_ICONS){
-    $.sequence('copy:dist', done);
+  if(FONT_ICONS){
+    $.sequence(['copy:gen', 'copy:font'], done);
   } else {
-    $.sequence('copy:dev', done);
+    $.sequence('copy:gen', done);
   }
 });
 
-// Copy assets to "dist/sources" 
+// Copy assets to "dist" folder
 // Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:dev', function() {
+GULP.task('copy:gen', function() {
   return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('dist/dev'));
+    .pipe(
+      $.cond(PRODUCTION, 
+        GULP.dest('dist/production'), 
+        GULP.dest('dist/dev')
+      )
+    );
 });
 
-// Copy assets to "dist/production" for production build
+// Copy assets to "dist/**/fonts" floder
 // Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:dist', function() {
-  return GULP.src(PATHS.assets)
-    .pipe(GULP.dest('dist/production'));
-});
-
-// Copy assets to "dist/sources" 
-// Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:font:dev', function() {
+GULP.task('copy:font', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
-    .pipe(GULP.dest('dist/dev/fonts'));
-});
-
-// Copy assets to "dist/production" for production build
-// Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:font:dist', function() {
-  return GULP.src(FONT_PATH)
-    .pipe($.flatten())
-    .pipe(GULP.dest('dist/production/fonts'));
+    .pipe(
+      $.cond(PRODUCTION, 
+        GULP.dest('dist/production/fonts'), 
+        GULP.dest('dist/dev/fonts')
+      )
+    );
 });
 
 /*******************************
