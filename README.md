@@ -5,7 +5,7 @@ Bootstrap Based CSS and JS for [ZENCART  E-Commerce](http://http://www.zen-cart.
 
 This is a template for generating CSS and JS files for ZENCART using Bootstrap.
 
-The template is based on [Bootswatch] (https://github.com/thomaspark/bootswatch) by Thomas Park and is released under the [MIT License] (https://github.com/dakanji/zencart_style/blob/master/LICENSE)
+The template is based on [Bootswatch] (https://github.com/thomaspark/bootswatch) by Thomas Park and is released under the [MIT License] (https://github.com/dakanji/zencart-style/blob/master/LICENSE)
 
 It comes with a [Gulp] (http://gulpjs.com/) powered build system with:
 - Built-in BrowserSync server
@@ -32,15 +32,15 @@ You will need to have the following utilities installed to use this template:
 To set up the template, first clone this repository using your favourite Git agent or manually:
 
 ```bash
-cd /local/path/to/zencart_style
-git clone https://github.com/dakanji/zencart_style zencart_style
+cd /local/path/to/zencart-style
+git clone https://github.com/dakanji/zencart-style zencart-style
 ```
 
 If you wish to contribute to this project, clone the fork using your favourite Git agent or manually:
 
 ```bash
-cd /local/path/to/zencart_style
-git clone https://github.com/YOUR_GITHUB_USERNAME/zencart_style zencart_style
+cd /local/path/to/zencart-style
+git clone https://github.com/YOUR_GITHUB_USERNAME/zencart-style zencart-style
 ```
 
 
@@ -48,7 +48,7 @@ git clone https://github.com/YOUR_GITHUB_USERNAME/zencart_style zencart_style
 Then open the folder in your command line, and install the needed dependencies:
 
 ```bash
-cd /local/path/to/zencart_style
+cd /local/path/to/zencart-style
 npm install && bower install
 ```
 
