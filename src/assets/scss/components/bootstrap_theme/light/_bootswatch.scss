@@ -6,6 +6,31 @@
 $web-font-path: "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic,700,700italic,800,800italic" !default;
 @import url($web-font-path);
 
+// Mixins =====================================================================
+
+@mixin btn($class,$bg){
+  .btn-#{$class} {
+    background-size: 200%;
+    background-position: 50%;
+
+    &:focus {
+      background-color: $bg;
+    }
+
+    &:hover,
+    &:active:hover {
+      background-color: darken($bg, 6%);
+    }
+
+    &:active {
+      background-color: darken($bg, 12%);
+      @include gradient-radial(darken($bg, 12%) 10%, $bg 11%);
+      background-size: 1000%;
+      @include box-shadow(2px 2px 4px rgba(0,0,0,.4));
+    }
+  }
+}
+
 // Navbar =====================================================================
 
 .navbar {
@@ -34,29 +59,6 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic
 }
 
 // Buttons ====================================================================
-
-@mixin btn($class,$bg){
-  .btn-#{$class} {
-    background-size: 200%;
-    background-position: 50%;
-
-    &:focus {
-      background-color: $bg;
-    }
-
-    &:hover,
-    &:active:hover {
-      background-color: darken($bg, 6%);
-    }
-
-    &:active {
-      background-color: darken($bg, 12%);
-      @include gradient-radial(darken($bg, 12%) 10%, $bg 11%);
-      background-size: 1000%;
-      @include box-shadow(2px 2px 4px rgba(0,0,0,.4));
-    }
-  }
-}
 
 @include btn(default,$btn-default-bg);
 @include btn(primary,$btn-primary-bg);
