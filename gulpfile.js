@@ -71,7 +71,7 @@ const PATHS = {
     '!src/assets/{img,js,scss}/**/',
     '!src/assets/{img,js,scss}/'
   ],
-  js_plugins: [
+  js_zencart: [
     'src/assets/js/**/*.js',
     '!src/assets/js/demopage/**/*.js'
   ],
@@ -134,10 +134,10 @@ GULP.task('pages', function(done) {
   var jquery_migrate_fallback = PRODUCTION ? '': JM_WRITE;
   var demo_js = '/dev/js/demo.js' + CACHEFLAG;
   
-  var main_css = css_path + 'main' + CSS_EXT + CACHEFLAG;
-  var main_js = js_path + 'main' + JS_EXT + CACHEFLAG;
-  var custom_css = css_path + 'custom' + CSS_EXT + CACHEFLAG;
-  var plugin_js = js_path + 'plugin' + JS_EXT + CACHEFLAG;
+  var bootstrap_css = css_path + 'bootstrap' + CSS_EXT + CACHEFLAG;
+  var bootstrap_js = js_path + 'bootstrap' + JS_EXT + CACHEFLAG;
+  var zencart_css = css_path + 'zencart' + CSS_EXT + CACHEFLAG;
+  var zencart_js = js_path + 'zencart' + JS_EXT + CACHEFLAG;
   var fonticon_css = !FONT_ICONS ? '' : css_path + 'fonticon' + CSS_EXT + CACHEFLAG;
   
   var replace_html = $.htmlReplace({
@@ -145,11 +145,11 @@ GULP.task('pages', function(done) {
     'jquery_fallback': JQ_WRITE,
     'jquery_migrate_js': jquery_migrate_js,
     'jquery_migrate_fallback': jquery_migrate_fallback,
-    'main_js': main_js,
-    'plugin_js': plugin_js, 
+    'bootstrap_js': bootstrap_js,
+    'zencart_js': zencart_js, 
     'demo_js': demo_js, 
-    'main_css': main_css,
-    'custom_css': custom_css,
+    'bootstrap_css': bootstrap_css,
+    'zencart_css': zencart_css,
     'fonticon_css': fonticon_css,
   });
 	
@@ -186,31 +186,31 @@ GULP.task('pages:regen', function(done) {
 GULP.task('sass', function(done) {
   if(PRODUCTION && FONT_ICONS){
     $.sequence(
-      ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
-      ['sass:main:minify', 'sass:fonticon:compile'], 
-      ['sass:custom:minify', 'sass:fonticon:minify'], 
+      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
+      ['sass:bootstrap:minify', 'sass:fonticon:compile'], 
+      ['sass:zencart:minify', 'sass:fonticon:minify'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
     $.sequence(
-      ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
+      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
       ['sass:fonticon:compile'], 
     done);
   } else if(PRODUCTION && !FONT_ICONS){
     $.sequence(
-      ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
-      ['sass:main:minify', 'sass:custom:minify'], 
+      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
+      ['sass:bootstrap:minify', 'sass:zencart:minify'], 
     done);
   } else {
     $.sequence(
-      ['sass:main:compile', 'sass:custom:compile', 'sass:glypicons:init'], 
+      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
     done);
   }
 });
 
-// Compile main Sass into CSS
-GULP.task('sass:main:compile', function() {
+// Compile bootstrap Sass into CSS
+GULP.task('sass:bootstrap:compile', function() {
 	
-  return GULP.src('src/assets/scss/main.scss')
+  return GULP.src('src/assets/scss/bootstrap.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
       .on('error', $.sass.logError))
@@ -227,19 +227,19 @@ GULP.task('sass:main:compile', function() {
     );
 });
 
-// Minify main CSS file for production build
-GULP.task('sass:main:minify', function() {
-  return GULP.src('dist/sources/css/main.css')
+// Minify bootstrap CSS file for production build
+GULP.task('sass:bootstrap:minify', function() {
+  return GULP.src('dist/sources/css/bootstrap.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
     .pipe($.extname('.min.css'))
     .pipe(GULP.dest('dist/production/css'));
 });
 
-// Compile custom Sass into CSS
-GULP.task('sass:custom:compile', ['sass:demo:compile'], function() {
+// Compile zencart Sass into CSS
+GULP.task('sass:zencart:compile', ['sass:demo:compile'], function() {
 	
-  return GULP.src('src/assets/scss/custom.scss')
+  return GULP.src('src/assets/scss/zencart.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
       .on('error', $.sass.logError))
@@ -275,9 +275,9 @@ GULP.task('sass:demo:compile', function() {
 	return stream;
 });
 
-// Minify custom CSS file for production build
-GULP.task('sass:custom:minify', function() {
-  return GULP.src('dist/sources/css/custom.css')
+// Minify zencart CSS file for production build
+GULP.task('sass:zencart:minify', function() {
+  return GULP.src('dist/sources/css/zencart.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
     .pipe($.extname('.min.css'))
@@ -344,7 +344,7 @@ GULP.task('javascript', function(done) {
   if(PRODUCTION){
     $.sequence(
       ['javascript:compile'], 
-      ['javascript:minify:main', 'javascript:minify:plugin', 'javascript:minify:jquery'], 
+      ['javascript:minify:bootstrap', 'javascript:minify:zencart', 'javascript:minify:jquery'], 
     done);
   } else {
     $.sequence('javascript:compile', done);
@@ -357,11 +357,10 @@ GULP.task('javascript:compile', function() {
   var target_dir = PRODUCTION ? JS_SRC : JS_DEV;
   var stream = EVENTS.concat(
     GULP.src('src/components/bootstrap-sass/assets/javascripts/bootstrap.js')
-      .pipe($.rename('main.js'))
       .pipe(GULP.dest(target_dir)),   
-    GULP.src(PATHS.js_plugins)
+    GULP.src(PATHS.js_zencart)
       .pipe($.sourcemaps.init())
-      .pipe($.concat('plugin.js'))
+      .pipe($.concat('zencart.js'))
       .pipe($.sourcemaps.write())
       .pipe(GULP.dest(target_dir)),
     GULP.src(PATHS.demo_js)
@@ -379,9 +378,9 @@ GULP.task('javascript:compile', function() {
   return stream;
 });
 
-// Minify "main" JS file for production build
-GULP.task('javascript:minify:main', function() {
-  return GULP.src(JS_SRC + '/main.js')
+// Minify "bootstrap" JS file for production build
+GULP.task('javascript:minify:bootstrap', function() {
+  return GULP.src(JS_SRC + '/bootstrap.js')
     .pipe($.uglify({preserveComments:"license"}))
     .pipe($.replace('/*', '\n\n/*'))
     .pipe($.replace('\n\n/*!', '/*!'))
@@ -397,9 +396,9 @@ GULP.task('javascript:minify:jquery', function() {
     .pipe(GULP.dest(JS_DIST));
 });
 
-// Minify "plugin" JS file for production build
-GULP.task('javascript:minify:plugin', function() {
-  return GULP.src(JS_SRC + '/plugin.js')
+// Minify "zencart" JS file for production build
+GULP.task('javascript:minify:zencart', function() {
+  return GULP.src(JS_SRC + '/zencart.js')
     .pipe($.uglify({preserveComments:"license"}))
     .pipe($.replace('/*', '\n\n/*'))
     .pipe($.replace('\n\n/*!', '/*!'))
