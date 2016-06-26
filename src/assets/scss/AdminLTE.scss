@@ -7,16 +7,17 @@
 !*/
 //google fonts
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
-//Bootstrap Variables & Mixins
-//The core bootstrap code have not been modified. These files
-//are included only for reference.
-@import (reference) "../bootstrap/mixins";
-@import (reference) "../bootstrap/variables";
+
+//Bootstrap 3.3.6 Variables & Mixins
+@import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+@import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+
 //MISC
 //----
 @import "core";
 @import "variables";
 @import "mixins";
+
 //COMPONENTS
 //-----------
 @import "header";
@@ -42,6 +43,7 @@
 @import "carousel";
 @import "modal";
 @import "social-widgets";
+
 //PAGES
 //------
 @import "mailbox";
@@ -50,11 +52,13 @@
 @import "404_500_errors";
 @import "invoice";
 @import "profile";
+
 //Plugins
 //--------
 @import "bootstrap-social";
 @import "fullcalendar";
 @import "select2";
+
 //Miscellaneous
 //-------------
 @import "miscellaneous";
