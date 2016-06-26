@@ -19,6 +19,6 @@
     "jquery-migrate-1.4.1": "https://code.jquery.com/jquery-migrate-1.4.1.js",
     "jquery-2.2.4": "https://code.jquery.com/jquery-2.2.4.js",
     "bootstrap-sass": "^3.3.6",
-    "jquery-ui": "^1.11.4"
+    "jquery-ui": "https://code.jquery.com/ui/1.11.4/jquery-ui.js"
   }
 }
