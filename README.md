@@ -1,15 +1,14 @@
 # Zencart Style
-Bootstrap Based CSS and JS for [ZENCART  E-Commerce](http://http://www.zen-cart.com).
+Bootstrap Based CSS and JS for [Zen Cart  E-Commerce](http://http://www.zen-cart.com).
 
 ## Introduction
 
-This is a template for generating CSS and JS files for ZENCART using Bootstrap.
+This is a template for generating CSS and JS files for Zen Cart using Bootstrap.
 
-The template is based on [Bootswatch] (https://github.com/thomaspark/bootswatch) by Thomas Park and is released under the [MIT License] (https://github.com/dakanji/zencart-style/blob/master/LICENSE)
+The template is based on [AdminLTE] (https://almsaeedstudio.com/) by Abdullah Almsaeed and is released under the [MIT License] (https://github.com/dakanji/zencart-style/blob/master/LICENSE)
 
 It comes with a [Gulp] (http://gulpjs.com/) powered build system with:
 - Built-in BrowserSync server
-- Handlebars HTML templating
 - Sass compilation and prefixing
 - JavaScript concatenation
 - CSS auto-prefixing
@@ -58,8 +57,8 @@ Your style guide will be created in a sub folder called `dist` and loaded in you
 
 You can now edit the various files in the src folder as desired and your changes will be immediately reflected in the browser. 
 
-When you are done, press `CTRL C` to stop the livereload process and run `npm run prod` to create compressed, production ready assets for ZENCART.
+When you are done, press `CTRL C` to stop the livereload process and run `npm run prod` to create compressed, production ready assets for Zen Cart.
 
 If you created a fork earlier, you can push your production changes to your fork and then create a pull request with your changes. 
 
-See the ZENCART guide to contributing to the project at this [LINK] (http://docs.zen-cart.com/Contributing/main).
+See the Zen Cart guide to contributing to the project at this [LINK] (http://docs.zen-cart.com/Contributing/main).
