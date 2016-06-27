@@ -35,7 +35,7 @@ cd /local/path/to/zencart-style
 git clone https://github.com/dakanji/zencart-style zencart-style
 ```
 
-If you wish to contribute to this project, clone the fork using your favourite Git agent or manually:
+If you wish to contribute to this project, fork the repo by clicking on the button on the top-right corner of the page and then clone the fork using your favourite Git agent or manually:
 
 ```bash
 cd /local/path/to/zencart-style
