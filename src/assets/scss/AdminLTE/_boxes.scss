@@ -4,7 +4,7 @@
  */
 .box {
   position: relative;
-  @include border-radius($box-border-radius);
+  @include border-radius-all($box-border-radius);
   background: #ffffff;
   border-top: 3px solid $box-default-border-top-color;
   margin-bottom: 20px;
@@ -148,7 +148,7 @@
   .overlay {
     z-index: 50;
     background: rgba(255, 255, 255, 0.7);
-    @include border-radius($box-border-radius);
+    @include border-radius-all($box-border-radius);
     > .fa {
       position: absolute;
       top: 50%;
@@ -236,7 +236,7 @@
 
 //Box Body
 .box-body {
-  @include border-radius(0; 0; $box-border-radius; $box-border-radius);
+  @include border-radius(0, 0, $box-border-radius, $box-border-radius);
   padding: $box-padding;
   .no-header & {
     @include border-top-radius($box-border-radius);
@@ -259,23 +259,23 @@
   }
 
   .box-pane {
-    @include border-radius(0; 0; $box-border-radius; 0);
+    @include border-radius(0, 0, $box-border-radius, 0);
   }
   .box-pane-right {
-    @include border-radius(0; 0; 0; $box-border-radius);
+    @include border-radius(0, 0, 0, $box-border-radius);
   }
 }
 
 //Box footer
 .box-footer {
-  @include border-radius(0; 0; $box-border-radius; $box-border-radius);
+  @include border-radius(0, 0, $box-border-radius, $box-border-radius);
   border-top: 1px solid $box-border-color;
   padding: $box-padding;
   background-color: $box-footer-bg;
 }
 
 .chart-legend {
-  &:extend(.list-unstyled);
+  @extend .list-unstyled;
   margin: 10px 0;
   > li {
     @media (max-width: $screen-sm-max) {
@@ -299,7 +299,7 @@
       padding-top: 0;
     }
     img {
-      &:extend(.img-sm);
+      @extend .img-sm;
       float: left;
     }
   }
@@ -330,7 +330,7 @@
   overflow: auto;
   // Todo list element
   > li {
-    @include border-radius(2px);
+    @include border-radius-all(2px);
     padding: 10px;
     background: #f4f4f4;
     margin-bottom: 2px;
@@ -424,7 +424,7 @@
       width: 40px;
       height: 40px;
       border: 2px solid transparent;
-      @include border-radius(50%);
+      @include border-radius-all(50%);
     }
 
     > .online {
@@ -446,7 +446,7 @@
 
     // The attachment
     > .attachment {
-      @include border-radius($attachment-border-radius);
+      @include border-radius-all($attachment-border-radius);
       background: #f4f4f4;
       margin-left: 65px;
       margin-right: 15px;

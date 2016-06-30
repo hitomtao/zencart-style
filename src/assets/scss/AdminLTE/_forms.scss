@@ -3,7 +3,7 @@
  * ---------------
  */
 .form-control {
-  @include border-radius($input-radius);
+  @include border-radius-all($input-radius);
   box-shadow: none;
   border-color: $gray;
   &:focus {
@@ -68,7 +68,7 @@
 /* Input group */
 .input-group {
   .input-group-addon {
-    @include border-radius($input-radius);
+    @include border-radius-all($input-radius);
     border-color: $gray;
     background-color: #fff;
   }
@@ -78,7 +78,7 @@
 .btn-group-vertical {
   .btn {
     &.btn-flat:first-of-type, &.btn-flat:last-of-type {
-      @include border-radius(0);
+      @include border-radius-all(0);
     }
   }
 }

@@ -73,41 +73,28 @@
 }
 
 //border radius creator
-@mixin border-radius($radius)
+@mixin border-radius-all($radius)
 {
   border-radius: $radius;
 }
 
 //Different radius each side
-.border-radius($top-left, $top-right, $bottom-left, $bottom-right)
+@mixin border-radius($top-left, $top-right, $bottom-left, $bottom-right)
 {
-  border-top-left-radius: $top-left
-;
-  border-top-right-radius: $top-right
-;
-  border-bottom-right-radius: $bottom-right
-;
-  border-bottom-left-radius: $bottom-left
-;
+  border-top-left-radius: $top-left;
+  border-top-right-radius: $top-right;
+  border-bottom-right-radius: $bottom-right;
+  border-bottom-left-radius: $bottom-left;
 }
 
 //Gradient background
-@mixin gradient($color: #F5F5F5, $start: #EEE, $stop: #FFF)
+@mixin gradient($color: #F5F5F5, $start: #EEE, $stop: #FFF, $important: '')
 {
-  background: $color;
-  background: -webkit-gradient(linear,
-  left bottom,
-  left top,
-  color-stop(0, $start),
-  color-stop(1, $stop));
-  background: -ms-linear-gradient(bottom,
-  $start,
-  $stop);
-  background: -moz-linear-gradient(center bottom,
-  $start 0%,
-  $stop 100%);
-  background: -o-linear-gradient($stop,
-  $start);
+  background: $color $important;
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, $start), color-stop(1, $stop)) $important;
+  background: -ms-linear-gradient(bottom, $start, $stop) $important;
+  background: -moz-linear-gradient(center bottom, $start 0%, $stop 100%) $important;
+  background: -o-linear-gradient($stop, $start) $important;
   filter: e(%("progid:DXImageTransform.Microsoft@include gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",$stop,$start));
 }
 

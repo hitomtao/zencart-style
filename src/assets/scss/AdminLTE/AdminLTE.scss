@@ -14,9 +14,9 @@
 
 //MISC
 //----
-@import "core";
 @import "variables";
 @import "mixins";
+@import "core";
 
 //COMPONENTS
 //-----------
@@ -55,9 +55,8 @@
 
 //Plugins
 //--------
-@import "bootstrap-social";
-@import "fullcalendar";
-@import "select2";
+@import "plugins/daterangepicker";
+@import "plugins/select2";
 
 //Miscellaneous
 //-------------
