@@ -57,22 +57,10 @@ const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="'
         + '"><\\/script>\');</script>';
 
 const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<script src="' 
-        + '/dev/js/jquery-migrate.js"><\\/script>\');</script>';
+        + '/js/jquery-migrate.js"><\\/script>\');</script>';
 
 // File paths to various assets are defined here.
 const PATHS = {
-  index_html: [
-    'src/components/AdminLTE/index.html',
-    'src/components/AdminLTE/index2.html'
-    ],
-  other_html: [
-    'src/pages/**/*.html',
-    '!src/pages/index.html',
-    '!src/pages/index2.html'
-    ],
-  demo_js: [
-    'src/demo/**/*.js'
-  ],
   assets: [
     'src/assets/**/*',
     '!src/assets/{img,js,scss}/**/*',
@@ -80,8 +68,8 @@ const PATHS = {
     '!src/assets/{img,js,scss}/'
   ],
   js_adminlte: [
-    'src/components/AdminLTEdist/js/demo.js',
-    'src/components/AdminLTEdist/js/pages/**/*.js',
+    'src/assets/AdminLTEdist/js/demo.js',
+    'src/assets/AdminLTEdist/js/pages/**/*.js',
   ],
   sass_fonticon_include: [
     FONT_SASS,
@@ -94,42 +82,48 @@ const PATHS = {
 
 
 
-  var css_path = PRODUCTION ? '/production/css/' : '/dev/css/';
-  var js_path = PRODUCTION ? '/production/js/' : '/dev/js/';
+var css_path = PRODUCTION ? '/production/css/' : '/dev/css/';
+var js_path = PRODUCTION ? '/production/js/' : '/dev/js/';
+var jq_temp = '<!-- build:jquery_js --><!-- endbuild --><!-- build:jquery_fallback --><!-- endbuild -->';
+ 
   
-  var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + '.min.js';
-  var jquery_migrate_js = PRODUCTION ? '': '//code.jquery.com/jquery-migrate-' + JQ_MIG + '.min.js';
-  var jquery_migrate_fallback = PRODUCTION ? '': JM_WRITE;
-  var demo_js = '/dev/js/demo.js' + CACHEFLAG;
-  
-  var bootstrap_css = css_path + 'bootstrap' + CSS_EXT + CACHEFLAG;
-  var bootstrap_js = js_path + 'bootstrap' + JS_EXT + CACHEFLAG;
-  var adminlte_css = css_path + 'adminlte' + CSS_EXT + CACHEFLAG;
-  var adminlte_js = js_path + 'adminlte' + JS_EXT + CACHEFLAG;
-  var fonticon_css = !FONT_ICONS ? '' : css_path + 'fonticon' + CSS_EXT + CACHEFLAG;
-  
-  var replace_html = {
-    'jquery_js': jquery_js,
+const REPLACE_HTML = {
+    'jquery_js': '//code.jquery.com/jquery-' + JQ_VER + '.min.js',
     'jquery_fallback': JQ_WRITE,
-    'jquery_migrate_js': jquery_migrate_js,
-    'jquery_migrate_fallback': jquery_migrate_fallback,
-    'bootstrap_js': bootstrap_js,
-    'adminlte_js': adminlte_js, 
-    'demo_js': demo_js, 
-    'bootstrap_css': bootstrap_css,
-    'adminlte_css': adminlte_css,
-    'fonticon_css': fonticon_css,
+    'jquery_migrate_js': PRODUCTION ? '': '//code.jquery.com/jquery-migrate-' + JQ_MIG + '.min.js',
+    'jquery_migrate_fallback': PRODUCTION ? '': JM_WRITE,
+    'bootstrap_js': js_path + 'bootstrap' + JS_EXT + CACHEFLAG,
+    'adminlte_js': css_path + 'adminlte' + CSS_EXT + CACHEFLAG, 
+    'bootstrap_css': css_path + 'bootstrap' + CSS_EXT + CACHEFLAG,
+    'adminlte_css': css_path + 'adminlte' + CSS_EXT + CACHEFLAG,
+    'fonticon_css': !FONT_ICONS ? '' : css_path + 'fonticon' + CSS_EXT + CACHEFLAG,
   };
 
 const REPLACE_THIS = [
-    ['dist/', 'dev/'],
-    ['plugins/', 'dev/js/plugins/'],
-    ['pages/', 'dev/pages/'],
-    ['bootstrap/css/', 'dev/css/'],
-    ['bootstrap/js/', 'dev/js/'],
+    ['<script src="../../plugins/jQuery/jquery-2.2.3.min.js"></script>', jq_temp],
+    ['<script src="../plugins/jQuery/jquery-2.2.3.min.js"></script>', jq_temp],
+    ['<script src="plugins/jQuery/jquery-2.2.3.min.js"></script>', jq_temp],
+    ['<!-- jQuery 2.2.3 -->', '<!-- jQuery ' + JQ_VER + ' -->'],
+    ["$.widget.bridge('uibutton', $.ui.button);", "$.widget.bridge('uibutton', $.ui.button); $.widget.bridge('uitooltip', $.ui.tooltip);"],
+    ['Resolve conflict in jQuery UI tooltip with Bootstrap tooltip', 'Resolve jQuery UI / Bootstrap Conflict'],
+    ['dist/js/demo', '/dev/js/demo/demo'],
+    ['dist/js/pages', '/dev/js/demo'],
+    ['plugins/', '/dev/js/plugins/'],
+    ['app.min.js', 'AdminLTE.min.js'],
+    ['bootstrap/css/', '/dev/css/'],
+    ['bootstrap/js/', '/dev/js/'],
+    ['pages/', '/dev/pages/'],
     ['.min.css', '.css'],
-    ['app.min.js', 'AdminLTE.js'],
-    ['.min.js', '.js']
+    ['.min.js', '.js'],
+    ['dist/', '/dev/'],
+    ['../../', '/'],
+    ['../dev/', '/dev/'],
+    ['../index', '/index'],
+    ['documentation/index.html', '//almsaeedstudio.com/themes/AdminLTE/documentation/index.html'],
+    ['index.html', '/dev/dashboard-v1.html'],
+    ['index2.html', '/dev/dashboard-v2.html'],
+    ['//dev/', '/dev/'],
+    ['jquery-jvectormap-1.2.2.js', 'jquery-jvectormap-1.2.2.min.js']
 ];
 
 
@@ -177,29 +171,32 @@ GULP.task('clean:dist', function(done) {
 GULP.task('pages', function(done) {
 
   var stream = EVENTS.concat(
-    GULP.src(PATHS.index_html)
+    GULP.src('src/assets/AdminLTE/index.html')
+      .pipe($.rename('dashboard-v1.html'))
       .pipe($.batchReplace(REPLACE_THIS))
-      .pipe(GULP.dest('dist')),   
-    GULP.src(PATHS.other_html)
+      .pipe($.htmlReplace(REPLACE_HTML))
+      .pipe($.prettify())
+      .pipe(GULP.dest('dist/dev')),
+    GULP.src('src/assets/AdminLTE/index2.html')
+      .pipe($.rename('dashboard-v2.html'))
       .pipe($.batchReplace(REPLACE_THIS))
+      .pipe($.htmlReplace(REPLACE_HTML))
+      .pipe($.prettify())
+      .pipe(GULP.dest('dist/dev')),
+    GULP.src('src/pages/**/*.html')
+      .pipe($.batchReplace(REPLACE_THIS))
+      .pipe($.htmlReplace(REPLACE_HTML))
+      .pipe($.prettify())
       .pipe(GULP.dest('dist')), 
-    GULP.src('src/components/AdminLTE/pages/**/*')
+    GULP.src('src/assets/AdminLTE/pages/**/*')
       .pipe($.batchReplace(REPLACE_THIS))
-      .pipe(GULP.dest('dist/dev/js/plugins')),   
-    GULP.src('src/components/AdminLTE/plugins/**/*')
+      .pipe($.htmlReplace(REPLACE_HTML))
+      .pipe($.prettify())
+      .pipe(GULP.dest('dist/dev/pages')),   
+    GULP.src('src/assets/AdminLTE/plugins/**/*')
       .pipe(GULP.dest('dist/dev/js/plugins'))   
   );  
   return stream;
-});
-
-// Rebuild HTML files
-GULP.task('pages:reset', function(done) {
-  $.sequence('pages:regen', done);
-});
-
-// Rebuild HTML files
-GULP.task('pages:regen', function(done) {
-  $.sequence(['pages', 'sass'], done);
 });
 
 /*******************************
@@ -275,7 +272,7 @@ GULP.task('sass:bootstrap:minify', function() {
 // Compile adminlte Sass into CSS
 GULP.task('sass:adminlte:compile', ['sass:skins:compile'], function() {
 	
-  return GULP.src('src/components/AdminLTE/build/less/AdminLTE.less')
+  return GULP.src('src/assets/AdminLTE/build/less/AdminLTE.less')
     .pipe($.sourcemaps.init())
     .pipe($.less())
     .pipe($.postcss(CSS_PROCESS))
@@ -292,12 +289,12 @@ GULP.task('sass:adminlte:compile', ['sass:skins:compile'], function() {
     );
 });
 
-// Compile demo Sass into CSS
+// Compile skins Sass into CSS
 GULP.task('sass:skins:compile', function() {
 
 	var stream;
 	  if (!PRODUCTION) {
-	  	stream = GULP.src('src/components/AdminLTE/build/less/skins/**/*.less')
+	  	stream = GULP.src('src/assets/AdminLTE/build/less/skins/**/*.less')
 	  	  .pipe($.sourcemaps.init())
           .pipe($.less())
 	  	  .pipe($.postcss(CSS_PROCESS))
@@ -338,7 +335,7 @@ GULP.task('sass:fonticon:compile', function(done) {
     .pipe($.sourcemaps.init())
     .pipe($.injectString.prepend("@import 'unit';\n\n"))
     .pipe($.sass({
-      includePaths: FONT_SASS
+      includePaths: PATHS.sass_fonticon_include
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer({
       browsers: COMPATIBILITY
@@ -391,12 +388,14 @@ GULP.task('javascript:compile', function() {
 
   var target_dir = PRODUCTION ? JS_SRC : JS_DEV;
   var stream = EVENTS.concat(
+    GULP.src('src/assets/AdminLTE/dist/js/pages/**/*.js')
+      .pipe(GULP.dest(target_dir + '/demo')),
+    GULP.src('src/assets/AdminLTE/dist/js/demo.js')
+      .pipe(GULP.dest(target_dir + '/demo')),
     GULP.src('src/components/bootstrap-sass/assets/javascripts/bootstrap.js')
       .pipe(GULP.dest(target_dir)),   
-    GULP.src('src/components/AdminLTE/dist/js/app.js')
+    GULP.src('src/assets/AdminLTE/dist/js/app.js')
       .pipe($.rename('AdminLTE.js'))
-      .pipe(GULP.dest(target_dir)),
-    GULP.src(PATHS.demo_js)
       .pipe(GULP.dest(target_dir)),
     GULP.src('src/components/jquery-' + JQ_VER + '/index.js')
       .pipe($.rename('jquery.js'))
@@ -441,7 +440,7 @@ GULP.task('javascript:minify:adminlte', function() {
 ********************************/
 // Copy image files to the "dist" folder
 GULP.task('images', function() {
-  return GULP.src('src/components/AdminLTE/dist/img/**/*')
+  return GULP.src('src/assets/AdminLTE/dist/img/**/*')
     .pipe(GULP.dest('dist/dev/img'));
 });
 
@@ -492,8 +491,8 @@ GULP.task('copy:font', function() {
 // Build the site, run the server, and watch for file changes
 GULP.task('default', ['server'], function() {
   GULP.watch(PATHS.assets, ['copy', BROWSER.reload]);
-  GULP.watch(['src/pages/**/*.html'], ['pages:regen', BROWSER.reload]);
-  GULP.watch(['src/{layouts,partials}/**/*.html'], ['pages:reset', BROWSER.reload]);
+  GULP.watch(['src/pages/**/*.html'], ['pages', BROWSER.reload]);
+  GULP.watch(['src/{layouts,partials}/**/*.html'], ['pages', BROWSER.reload]);
   GULP.watch(['src/assets/scss/**/*.scss'], ['sass:regen', BROWSER.reload]);
   GULP.watch(['src/assets/js/**/*.js'], ['javascript', BROWSER.reload]);
   GULP.watch(['src/assets/img/**/*'], ['images', BROWSER.reload]);

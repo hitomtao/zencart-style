@@ -16,10 +16,7 @@
   ],
   "private": true,
   "devDependencies": {
-    "AdminLTE": "admin-lte#^2.3.4",
-    "bootstrap": "^3.3.6",
     "bootstrap-sass": "^3.3.6",
-    "jquery-migrate-1.4.1": "https://code.jquery.com/jquery-migrate-1.4.1.js"
-  },
-  "dependencies": {}
+    "jquery-ui": "jqueryui#^1.11.4"
+  }
 }
