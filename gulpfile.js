@@ -42,8 +42,8 @@ const JQ_MIG = '1.4.1';
 
 // Use additional font icons
 const FONT_ICONS = true;
-const FONT_SASS='src/assets/scss/components/fonticons/**/scss/';
-const FONT_PATH='src/assets/scss/components/fonticons/**/fonts/**/*';
+const FONT_SASS='src/fonticons/**/scss/';
+const FONT_PATH='src/fonticons/**/fonts/**/*';
 
 // Misc filesystem paths
 const JS_DEV = 'dist/dev/js';
@@ -63,20 +63,20 @@ const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<scri
 const PATHS = {
   assets: [
     'src/assets/**/*',
-    '!src/assets/{img,js,scss}/**/*',
-    '!src/assets/{img,js,scss}/**/',
-    '!src/assets/{img,js,scss}/'
+    '!src/assets/{img,js,scss,AdminLTE}/**/*',
+    '!src/assets/{img,js,scss,AdminLTE}/**/',
+    '!src/assets/{img,js,scss,AdminLTE}/'
   ],
   js_adminlte: [
-    'src/assets/AdminLTEdist/js/demo.js',
-    'src/assets/AdminLTEdist/js/pages/**/*.js',
+    'src/AdminLTE/dist/js/demo.js',
+    'src/AdminLTE/dist/js/pages/**/*.js',
   ],
-  sass_fonticon_include: [
+  stylesheet_fonticon_include: [
     FONT_SASS,
-    'src/assets/scss/components/fonticons/foundation-icons/scss/'
+    'src/fonticons/foundation-icons/scss/'
   ],
   glyphicons: [
-    'src/components/bootstrap-sass/assets/fonts/bootstrap/**/*'
+    'src/bootstrap-sass/assets/fonts/bootstrap/**/*'
   ]
 };
 
@@ -136,7 +136,7 @@ const REPLACE_THIS = [
 GULP.task('build', function(done) {
   $.sequence(
     ['clean:dist'], 
-    ['pages', 'sass', 'javascript', 'images', 'copy'], 
+    ['pages', 'stylesheet', 'javascript', 'images', 'copy'], 
   done);
 });
 
@@ -159,7 +159,7 @@ GULP.task('server', ['build'], function() {
 ********************************/
 // Remove the "dist" folder if it exists
 GULP.task('clean:dist', function(done) {
-  return REMOVE('dist/**');
+  return REMOVE('dist');
 });
 
 /*******************************
@@ -171,29 +171,29 @@ GULP.task('clean:dist', function(done) {
 GULP.task('pages', function(done) {
 
   var stream = EVENTS.concat(
-    GULP.src('src/assets/AdminLTE/index.html')
+    GULP.src('src/AdminLTE/index.html')
       .pipe($.rename('dashboard-v1.html'))
       .pipe($.batchReplace(REPLACE_THIS))
       .pipe($.htmlReplace(REPLACE_HTML))
       .pipe($.prettify())
       .pipe(GULP.dest('dist/dev')),
-    GULP.src('src/assets/AdminLTE/index2.html')
+    GULP.src('src/AdminLTE/index2.html')
       .pipe($.rename('dashboard-v2.html'))
       .pipe($.batchReplace(REPLACE_THIS))
       .pipe($.htmlReplace(REPLACE_HTML))
       .pipe($.prettify())
       .pipe(GULP.dest('dist/dev')),
-    GULP.src('src/pages/**/*.html')
+    GULP.src('src/index.html')
       .pipe($.batchReplace(REPLACE_THIS))
       .pipe($.htmlReplace(REPLACE_HTML))
       .pipe($.prettify())
       .pipe(GULP.dest('dist')), 
-    GULP.src('src/assets/AdminLTE/pages/**/*')
+    GULP.src('src/AdminLTE/pages/**/*')
       .pipe($.batchReplace(REPLACE_THIS))
       .pipe($.htmlReplace(REPLACE_HTML))
       .pipe($.prettify())
       .pipe(GULP.dest('dist/dev/pages')),   
-    GULP.src('src/assets/AdminLTE/plugins/**/*')
+    GULP.src('src/AdminLTE/plugins/**/*')
       .pipe(GULP.dest('dist/dev/js/plugins'))   
   );  
   return stream;
@@ -205,45 +205,45 @@ GULP.task('pages', function(done) {
   ****************************
 ********************************/
 // CSS build dispatcher
-GULP.task('sass', function(done) {
+GULP.task('stylesheet', function(done) {
   if(PRODUCTION && FONT_ICONS){
     $.sequence(
-      ['sass:bootstrap:prep'], 
-      ['sass:bootstrap:compile', 'sass:adminlte:compile', 'sass:glypicons:init'], 
-      ['sass:bootstrap:minify', 'sass:fonticon:compile'], 
-      ['sass:adminlte:minify', 'sass:fonticon:minify'], 
+      ['stylesheet:bootstrap:prep'], 
+      ['stylesheet:bootstrap:compile', 'stylesheet:adminlte:compile', 'stylesheet:glypicons:init'], 
+      ['stylesheet:bootstrap:minify', 'stylesheet:fonticon:compile'], 
+      ['stylesheet:adminlte:minify', 'stylesheet:fonticon:minify'], 
     done);
   } else if(!PRODUCTION && FONT_ICONS){
     $.sequence(
-      ['sass:bootstrap:prep'], 
-      ['sass:bootstrap:compile', 'sass:adminlte:compile', 'sass:glypicons:init'], 
-      ['sass:fonticon:compile'], 
+      ['stylesheet:bootstrap:prep'], 
+      ['stylesheet:bootstrap:compile', 'stylesheet:adminlte:compile', 'stylesheet:glypicons:init'], 
+      ['stylesheet:fonticon:compile'], 
     done);
   } else if(PRODUCTION && !FONT_ICONS){
     $.sequence(
-      ['sass:bootstrap:prep'], 
-      ['sass:bootstrap:compile', 'sass:adminlte:compile', 'sass:glypicons:init'], 
-      ['sass:bootstrap:minify', 'sass:adminlte:minify'], 
+      ['stylesheet:bootstrap:prep'], 
+      ['stylesheet:bootstrap:compile', 'stylesheet:adminlte:compile', 'stylesheet:glypicons:init'], 
+      ['stylesheet:bootstrap:minify', 'stylesheet:adminlte:minify'], 
     done);
   } else {
     $.sequence(
-      ['sass:bootstrap:prep'], 
-      ['sass:bootstrap:compile', 'sass:adminlte:compile', 'sass:glypicons:init'], 
+      ['stylesheet:bootstrap:prep'], 
+      ['stylesheet:bootstrap:compile', 'stylesheet:adminlte:compile', 'stylesheet:glypicons:init'], 
     done);
   }
 });
 
 // Compile bootstrap Sass into CSS
-GULP.task('sass:bootstrap:prep', function() {
-  return GULP.src('src/components/bootstrap-sass/assets/stylesheets/_bootstrap.scss')
+GULP.task('stylesheet:bootstrap:prep', function() {
+  return GULP.src('src/bootstrap-sass/assets/stylesheets/_bootstrap.scss')
     .pipe($.rename('bootstrap.scss'))
-    .pipe(GULP.dest('src/components/bootstrap-sass/assets/stylesheets'));
+    .pipe(GULP.dest('src/bootstrap-sass/assets/stylesheets'));
 });
 
 // Compile bootstrap Sass into CSS
-GULP.task('sass:bootstrap:compile', function() {
+GULP.task('stylesheet:bootstrap:compile', function() {
 	
-  return GULP.src('src/components/bootstrap-sass/assets/stylesheets/bootstrap.scss')
+  return GULP.src('src/bootstrap-sass/assets/stylesheets/bootstrap.scss')
     .pipe($.sourcemaps.init())
     .pipe($.sass()
       .on('error', $.sass.logError))
@@ -261,7 +261,7 @@ GULP.task('sass:bootstrap:compile', function() {
 });
 
 // Minify bootstrap CSS file for production build
-GULP.task('sass:bootstrap:minify', function() {
+GULP.task('stylesheet:bootstrap:minify', function() {
   return GULP.src('dist/sources/css/bootstrap.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
@@ -270,9 +270,9 @@ GULP.task('sass:bootstrap:minify', function() {
 });
 
 // Compile adminlte Sass into CSS
-GULP.task('sass:adminlte:compile', ['sass:skins:compile'], function() {
+GULP.task('stylesheet:adminlte:compile', ['stylesheet:skins:compile'], function() {
 	
-  return GULP.src('src/assets/AdminLTE/build/less/AdminLTE.less')
+  return GULP.src('src/AdminLTE/build/less/AdminLTE.less')
     .pipe($.sourcemaps.init())
     .pipe($.less())
     .pipe($.postcss(CSS_PROCESS))
@@ -290,11 +290,11 @@ GULP.task('sass:adminlte:compile', ['sass:skins:compile'], function() {
 });
 
 // Compile skins Sass into CSS
-GULP.task('sass:skins:compile', function() {
+GULP.task('stylesheet:skins:compile', function() {
 
 	var stream;
 	  if (!PRODUCTION) {
-	  	stream = GULP.src('src/assets/AdminLTE/build/less/skins/**/*.less')
+	  	stream = GULP.src('src/AdminLTE/build/less/skins/**/*.less')
 	  	  .pipe($.sourcemaps.init())
           .pipe($.less())
 	  	  .pipe($.postcss(CSS_PROCESS))
@@ -308,7 +308,7 @@ GULP.task('sass:skins:compile', function() {
 });
 
 // Minify adminlte CSS file for production build
-GULP.task('sass:adminlte:minify', function() {
+GULP.task('stylesheet:adminlte:minify', function() {
   return GULP.src('dist/sources/css/adminlte.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
@@ -317,7 +317,7 @@ GULP.task('sass:adminlte:minify', function() {
 });
 
 
-GULP.task('sass:glypicons:init', function(done) {
+GULP.task('stylesheet:glypicons:init', function(done) {
 	
   return GULP.src(PATHS.glyphicons)
     .pipe(
@@ -329,13 +329,13 @@ GULP.task('sass:glypicons:init', function(done) {
 });
 
 // Prep fonticon Sass
-GULP.task('sass:fonticon:compile', function(done) {
+GULP.task('stylesheet:fonticon:compile', function(done) {
 	
   return GULP.src(FONT_SASS + '**/*.scss')
     .pipe($.sourcemaps.init())
     .pipe($.injectString.prepend("@import 'unit';\n\n"))
     .pipe($.sass({
-      includePaths: PATHS.sass_fonticon_include
+      includePaths: PATHS.stylesheet_fonticon_include
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer({
       browsers: COMPATIBILITY
@@ -353,7 +353,7 @@ GULP.task('sass:fonticon:compile', function(done) {
 });
 
 // Minify fonticon CSS file for production build
-GULP.task('sass:fonticon:minify', function() {
+GULP.task('stylesheet:fonticon:minify', function() {
   return GULP.src('dist/sources/css/fonticon.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
@@ -362,8 +362,8 @@ GULP.task('sass:fonticon:minify', function() {
 });
 
 // Rebuild scss files
-GULP.task('sass:regen', function(done) {
-  $.sequence('sass', done);
+GULP.task('stylesheet:regen', function(done) {
+  $.sequence('stylesheet', done);
 });
 
 /*******************************
@@ -388,19 +388,19 @@ GULP.task('javascript:compile', function() {
 
   var target_dir = PRODUCTION ? JS_SRC : JS_DEV;
   var stream = EVENTS.concat(
-    GULP.src('src/assets/AdminLTE/dist/js/pages/**/*.js')
+    GULP.src('src/AdminLTE/dist/js/pages/**/*.js')
       .pipe(GULP.dest(target_dir + '/demo')),
-    GULP.src('src/assets/AdminLTE/dist/js/demo.js')
+    GULP.src('src/AdminLTE/dist/js/demo.js')
       .pipe(GULP.dest(target_dir + '/demo')),
-    GULP.src('src/components/bootstrap-sass/assets/javascripts/bootstrap.js')
+    GULP.src('src/bootstrap-sass/assets/javascripts/bootstrap.js')
       .pipe(GULP.dest(target_dir)),   
-    GULP.src('src/assets/AdminLTE/dist/js/app.js')
+    GULP.src('src/AdminLTE/dist/js/app.js')
       .pipe($.rename('AdminLTE.js'))
       .pipe(GULP.dest(target_dir)),
-    GULP.src('src/components/jquery-' + JQ_VER + '/index.js')
+    GULP.src('src/jquery-' + JQ_VER + '/index.js')
       .pipe($.rename('jquery.js'))
       .pipe(GULP.dest(target_dir)),
-    GULP.src('src/components/jquery-migrate-' + JQ_MIG + '/index.js')
+    GULP.src('src/jquery-migrate-' + JQ_MIG + '/index.js')
       .pipe( $.cond( !PRODUCTION, $.rename('jquery-migrate.js') ) )
       .pipe( $.cond( !PRODUCTION, GULP.dest(target_dir) ) )
   );  
@@ -440,7 +440,7 @@ GULP.task('javascript:minify:adminlte', function() {
 ********************************/
 // Copy image files to the "dist" folder
 GULP.task('images', function() {
-  return GULP.src('src/assets/AdminLTE/dist/img/**/*')
+  return GULP.src('src/AdminLTE/dist/img/**/*')
     .pipe(GULP.dest('dist/dev/img'));
 });
 
@@ -491,9 +491,9 @@ GULP.task('copy:font', function() {
 // Build the site, run the server, and watch for file changes
 GULP.task('default', ['server'], function() {
   GULP.watch(PATHS.assets, ['copy', BROWSER.reload]);
-  GULP.watch(['src/pages/**/*.html'], ['pages', BROWSER.reload]);
+  GULP.watch(['src/index.html'], ['pages', BROWSER.reload]);
   GULP.watch(['src/{layouts,partials}/**/*.html'], ['pages', BROWSER.reload]);
-  GULP.watch(['src/assets/scss/**/*.scss'], ['sass:regen', BROWSER.reload]);
+  GULP.watch(['src/assets/scss/**/*.scss'], ['stylesheet:regen', BROWSER.reload]);
   GULP.watch(['src/assets/js/**/*.js'], ['javascript', BROWSER.reload]);
   GULP.watch(['src/assets/img/**/*'], ['images', BROWSER.reload]);
 });
