@@ -1,0 +1,67 @@
+/*!
+ *   AdminLTE v2.3.3
+ *   Author: Almsaeed Studio
+ *	 Website: Almsaeed Studio <http://almsaeedstudio.com>
+ *   License: Open source - MIT
+ *           Please visit http://opensource.org/licenses/MIT for more information
+!*/
+//google fonts
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
+
+//Bootstrap Variables & Mixins
+@import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+
+//AdminLTE Variables & Mixins
+//----
+@import "variables";
+@import "mixins";
+
+//AdminLTE Core
+//----
+@import "core";
+
+//AdminLTE Components
+//-----------
+@import "header";
+@import "sidebar";
+@import "sidebar-mini";
+@import "control-sidebar";
+@import "dropdown";
+@import "forms";
+@import "progress-bars";
+@import "small-box";
+@import "boxes";
+@import "info-box";
+@import "timeline";
+@import "buttons";
+@import "callout";
+@import "alerts";
+@import "navs";
+@import "products";
+@import "table";
+@import "labels";
+@import "direct-chat";
+@import "users-list";
+@import "carousel";
+@import "modal";
+@import "social-widgets";
+
+//AdminLTE Pages
+//------
+@import "mailbox";
+@import "lockscreen";
+@import "login_and_register";
+@import "404_500_errors";
+@import "invoice";
+@import "profile";
+
+//AdminLTE Plugins
+//--------
+@import "plugins/daterangepicker";
+@import "plugins/select2";
+
+//AdminLTE Miscellaneous
+//-------------
+@import "miscellaneous";
+@import "print";
