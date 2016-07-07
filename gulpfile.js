@@ -214,6 +214,7 @@ GULP.task('stylesheet:bootstrap:init', function() {
 // Process Minified Text Bootstrap CSS File
 GULP.task('stylesheet:bootstrap:prod', function() {
   return GULP.src(['src/components/bootstrap/dist/css/bootstrap.min.css'])
+    .pipe($.replace('*/', '*/\n'))
     .pipe(GULP.dest(DIST_ADMIN_PROD + '/css'));
 });
 
@@ -236,6 +237,8 @@ GULP.task('stylesheet:adminlte:init', function() {
 // Process Minified Text AdminLTE CSS Files
 GULP.task('stylesheet:adminlte:prod', function() {
   return GULP.src(['src/components/AdminLTE/assets/css/minified/**/*.css'])
+    .pipe($.replace('*/', '*/\n'))
+    .pipe($.replace('/*', '\n/*'))
     .pipe(GULP.dest(DIST_ADMIN_PROD + '/css'));
 });
 
