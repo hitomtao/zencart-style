@@ -46,6 +46,5 @@ temp/
 tmp/
 
 # Misc others
-dist/index.html
-dist/img/
-dist/dev/
+zencart/index.html
+zencart/dev/
