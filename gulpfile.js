@@ -43,9 +43,9 @@ const DIST_DEMO_DEV		= 'zencart/dev/demo'
 const DIST_ADMIN_DEV	= 'zencart/dev/zc_admin/includes/template'
 const DIST_ADMIN_SRC	= 'zencart/sources/zc_admin/includes/template'
 const DIST_ADMIN_PROD	= 'zencart/production/zc_admin/includes/template'
-const DIST_CATALOG_DEV	= 'zencart/dev/zc_catalog'
-const DIST_CATALOG_SRC	= 'zencart/sources/zc_catalog'
-const DIST_CATALOG_PROD	= 'zencart/production/zc_catalog'
+const DIST_CATALOG_DEV	= 'zencart/dev/zc_catalog/includes/templates/template_default'
+const DIST_CATALOG_SRC	= 'zencart/sources/zc_catalog/includes/templates/template_default'
+const DIST_CATALOG_PROD	= 'zencart/production/zc_catalog/includes/templates/template_default'
 const JS_EXT			= PRODUCTION ? '.min.js' : '.js';
 const CSS_EXT			= PRODUCTION ? '.min.css' : '.css';
 
@@ -53,9 +53,9 @@ const CSS_EXT			= PRODUCTION ? '.min.css' : '.css';
 const PATHS	= {
 				assets: [
 					'src/assets/**/*',
-					'!src/assets/{images,javascript,scss,plugins}/**/*',
-					'!src/assets/{images,javascript,scss,plugins}/**/',
-					'!src/assets/{images,javascript,scss,plugins}/'
+					'!src/assets/{images,javascript-admin,javascript-catalog,scss,plugins}/**/*',
+					'!src/assets/{images,javascript-admin,javascript-catalog,scss,plugins}/**/',
+					'!src/assets/{images,javascript-admin,javascript-catalog,scss,plugins}/'
 				],
 				js_plugins: [
 					'src/assets/plugins/**/*',
@@ -578,20 +578,24 @@ GULP.task('plugins', function() {
 GULP.task('javascript', ['plugins'], function() {
 
   var admin_dir = PRODUCTION ? DIST_ADMIN_SRC + '/javascript' : DIST_ADMIN_DEV + '/javascript';
-  var catalog_dir = PRODUCTION ? DIST_CATALOG_SRC + '/javascript' : DIST_CATALOG_DEV + '/javascript';
+  var catalog_dir = PRODUCTION ? DIST_CATALOG_SRC + '/jscript' : DIST_CATALOG_DEV + '/jscript';
   
   return STREAM.concat(
   
-    // ZEN CART JS FILES 
-    GULP.src(['src/assets/javascript/**/*.js'])
-    
+    // ZEN CART CATALOG JS FILES 
+    GULP.src(['src/assets/javascript-catalog/**/*.js'])
+      // Save to development or sources folders depending on whether this is a production run or not
+      .pipe( GULP.dest(catalog_dir) )
+      // Minify and save to production destination folders if this is a production run
+      .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
+      .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
+      .pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
+      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/jscript') ) ),
+      
+    // ZEN CART ADMIN JS FILES 
+    GULP.src(['src/assets/javascript-admin/**/*.js'])
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
-      .pipe( GULP.dest(catalog_dir) )
-      
-      // Save to demo folder if this is not a production run 
-      .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_DEMO_DEV + '/javascript') ) )
-      
       // Minify and save to production destination folders if this is a production run
       .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
       .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
@@ -605,39 +609,30 @@ GULP.task('javascript', ['plugins'], function() {
       
     // BOOTSTRAP JS FILE
     GULP.src(['src/components/bootstrap/dist/js/bootstrap.js'])
-    
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
       .pipe( GULP.dest(catalog_dir) )
-      
       // Save to demo folder if this is not a production run 
       .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_DEMO_DEV + '/javascript') ) )
-      
       // Minify and save to production destination folders if this is a production run
       .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
       .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
       .pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
-      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/javascript') ) )
+      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/jscript') ) )
       .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) ),
       
     // AdminLTE JS File 
     GULP.src(['src/AdminLTE/assets/js/app.js'])
-    
       // Change name from app.js
       .pipe( $.rename('AdminLTE.js') )
-      
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
-      .pipe( GULP.dest(catalog_dir) )
-      
       // Save to demo folder if this is not a production run 
       .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_DEMO_DEV + '/javascript') ) )
-      
       // Minify and save to production destination folders if this is a production run
       .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
       .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
       .pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
-      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/javascript') ) )
       .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) ),
       
     // JQUERY FILE 
@@ -645,57 +640,42 @@ GULP.task('javascript', ['plugins'], function() {
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
       .pipe( GULP.dest(catalog_dir) )
-      
       // Save to demo folder if this is not a production run 
       .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_DEMO_DEV + '/javascript') ) )
-      
       // Minify and save to production destination folders if this is a production run
       .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
       .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
       .pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
-      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/javascript') ) )
+      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/jscript') ) )
       .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) ),
       
     // JQUERY-UI FILE 
     GULP.src(['src/components/jquery-ui/jquery-ui.js'])
-    
       // Append functions to resolve conflicts with Bootstrap buttons and tooltips
       .pipe( $.injectString.append("$.widget.bridge('uibutton', $.ui.button);$.widget.bridge('uitooltip', $.ui.tooltip);") ) 
-      
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
-      .pipe( GULP.dest(catalog_dir) )
-      
       // Save to demo folder if this is not a production run 
       .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_DEMO_DEV + '/javascript') ) )
-      
       // Minify and save to production destination folders if this is a production run
       .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
       .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
       .pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
-      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/javascript') ) )
       .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) ),
       
     // JQUERY-UI LOCALISATION FILES 
     GULP.src(['src/components/jquery-ui/ui/i18n/*.js'])
-    
       // Concatenate into a single file 
       .pipe( $.concat('jquery-ui-i18n.js') )
-      
       // Prepend Licensing Information 
       .pipe( $.injectString.prepend("/*! jQueryUI i18n | Copyright jQuery Foundation and other contributors | MIT License */") )
       .pipe( $.cond(PRODUCTION, $.batchReplace([['*//*', '*/\n\n/*']]) ) )
-      
-      
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
-      .pipe( GULP.dest(catalog_dir) )
-      
       // Minify and save to production destination folders if this is a production run
       .pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
       .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
       .pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
-      .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/javascript') ) )
       .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) )
       
   ); 

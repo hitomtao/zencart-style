@@ -4,19 +4,20 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version GIT: $Id: Author: Ian Wilson  Modified in v1.6.0 $
  */
-
 if (typeof zcJS == "undefined" || !zcJS) {
   window.zcJS = { name: 'zcJS', version: '0.1.0.0' };
-};
+}
 
 zcJS.ajax = function (options) {
-  options.url = options.url.replace(/&amp;/g, '&');
+  options.url = options.url.replace("&amp;", "&");
   var deferred = $.Deferred(function (d) {
+      var securityToken = zcJS.securityToken;
       var defaults = {
           cache: false,
           type: 'POST',
           traditional: true,
           dataType: 'json',
+          timeout: 5000,
           data: $.extend(true,{
             securityToken: securityToken
         }, options.data)
@@ -33,13 +34,15 @@ zcJS.ajax = function (options) {
           error: function (jqXHR, textStatus, errorThrown) {
               console.log(jqXHR);
               d.reject(jqXHR, textStatus, errorThrown);
-          }
-          //complete: d.resolve
+          },
+          complete: d.resolve
       });
       $.ajax(jqXHRSettings);
    }).fail(function(jqXHR, textStatus, errorThrown) {
    var response = jqXHR.getResponseHeader('status');
-     switch (response)
+   var responseHtml = jqXHR.responseText;
+   var contentType = jqXHR.getResponseHeader("content-type");
+   switch (response)
      {
        case '403 Forbidden':
          var jsonResponse = JSON.parse(jqXHR.responseText);
@@ -52,16 +55,17 @@ zcJS.ajax = function (options) {
            break;
            case 'SECURITY_TOKEN':
            break;
-           case 'CUSTOM_ALERT_ERROR':
-             alert(jsonResponse.errorMessage);
-           break;
 
            default:
              alert('An Internal Error of type '+errorType+' was received while processing an ajax call. The action you requested could not be completed.');
          }
        break;
        default:
-         alert('An unknown response was received while processing an ajax call. The action you requested could not be completed.');
+        if (jqXHR.status === 200 && contentType.toLowerCase().indexOf("text/html") >= 0) {
+         document.open();
+         document.write(responseHtml);
+         document.close();
+         }
      }
    });
 
