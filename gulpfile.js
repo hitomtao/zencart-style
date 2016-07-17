@@ -52,10 +52,10 @@ const CSS_EXT			= PRODUCTION ? '.min.css' : '.css';
 // File paths to various assets.
 const PATHS	= {
 				assets: [
-					'src/assets/**/*',
-					'!src/assets/{images,javascript-admin,javascript-catalog,scss,plugins}/**/*',
-					'!src/assets/{images,javascript-admin,javascript-catalog,scss,plugins}/**/',
-					'!src/assets/{images,javascript-admin,javascript-catalog,scss,plugins}/'
+					'src/assets/{zc_admin,zc_catalog}/**/*',
+					'!src/assets/{zc_admin,zc_catalog}/{images,javascript,scss,plugins}/**/*',
+					'!src/assets/{zc_admin,zc_catalog}/{images,javascript,scss,plugins}/**/',
+					'!src/assets/{zc_admin,zc_catalog}/{images,javascript,scss,plugins}/'
 				],
 				js_plugins: [
 					'src/assets/plugins/**/*',
@@ -247,7 +247,12 @@ GULP.task('pages', function() {
 ********************************/
 // CSS build dispatcher
 GULP.task('stylesheet', function(done) {
-  $.sequence('stylesheet:bootstrap', 'stylesheet:adminlte', 'stylesheet:fonticon', done);
+  $.sequence(
+    ['stylesheet:bootstrap'], 
+    ['stylesheet:adminlte'], 
+    ['stylesheet:zencart:admin', 'stylesheet:zencart:catalog'], 
+    ['stylesheet:fonticon'], 
+  done);
 });
 
 GULP.task('stylesheet:bootstrap', function() {
@@ -294,21 +299,18 @@ GULP.task('stylesheet:adminlte', function() {
   var dev_destination = [];
   if (PRODUCTION) {
     dev_destination.push(
-      GULP.dest(DIST_ADMIN_SRC + '/css'),
-      GULP.dest(DIST_CATALOG_SRC + '/css')
+      GULP.dest(DIST_ADMIN_SRC + '/css')
     );
   } else {
     dev_destination.push(
       GULP.dest(DIST_DEMO_DEV + '/css'), 
-      GULP.dest(DIST_ADMIN_DEV + '/css'), 
-      GULP.dest(DIST_CATALOG_DEV + '/css')
+      GULP.dest(DIST_ADMIN_DEV + '/css')
     );
   }
 
   var prod_destination = [];
   prod_destination.push(
-    GULP.dest(DIST_ADMIN_PROD + '/css'), 
-    GULP.dest(DIST_CATALOG_PROD + '/css')
+    GULP.dest(DIST_ADMIN_PROD + '/css') 
   );
 
   return GULP.src(['src/AdminLTE/assets/css/**/*.css'])
@@ -328,6 +330,76 @@ GULP.task('stylesheet:adminlte', function() {
     .pipe( $.cond(PRODUCTION, $.extname(CSS_EXT) ) )
     .pipe( $.cond(PRODUCTION, $.multistream.apply(undefined, prod_destination) ) );
     
+});
+
+// Process Zen Cart Admin CSS Files
+GULP.task('stylesheet:zencart:admin', function() {
+  var dev_destination = [];
+  if (PRODUCTION) {
+    dev_destination.push(
+      GULP.dest(DIST_ADMIN_SRC + '/css')
+    );
+  } else {
+    dev_destination.push(
+      GULP.dest(DIST_ADMIN_DEV + '/css')
+    );
+  }
+
+  var prod_destination = [];
+  prod_destination.push(
+    GULP.dest(DIST_ADMIN_PROD + '/css') 
+  );
+
+  return GULP.src(['src/assets/zc_admin/scss/**/*.scss'])
+     // Convert from sass to css
+    .pipe( $.sass().on('error', $.sass.logError) )
+     // Apply CSS PostProcessing Rules  
+    .pipe( $.postcss(CSS_PROCESS) )
+	.pipe( $.autoprefixer({
+		browsers: COMPATIBILITY
+	}) )
+     // Save to development or sources destination folders 
+    .pipe( $.multistream.apply(undefined, dev_destination) )
+     // Minify and save to production destination folders if this is a production run
+    .pipe( $.cond(PRODUCTION, $.cssnano() ) )
+    .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
+    .pipe( $.cond(PRODUCTION, $.extname(CSS_EXT) ) )
+    .pipe( $.cond(PRODUCTION, $.multistream.apply(undefined, prod_destination) ) );
+});
+
+// Process Zen Cart Admin CSS Files
+GULP.task('stylesheet:zencart:catalog', function() {
+  var dev_destination = [];
+  if (PRODUCTION) {
+    dev_destination.push(
+      GULP.dest(DIST_CATALOG_SRC + '/css')
+    );
+  } else {
+    dev_destination.push(
+      GULP.dest(DIST_CATALOG_DEV + '/css')
+    );
+  }
+
+  var prod_destination = [];
+  prod_destination.push(
+    GULP.dest(DIST_CATALOG_PROD + '/css') 
+  );
+
+  return GULP.src(['src/assets/zc_catalog/scss/**/*.scss'])
+     // Convert from sass to css
+    .pipe( $.sass().on('error', $.sass.logError) )
+     // Apply CSS PostProcessing Rules  
+    .pipe( $.postcss(CSS_PROCESS) )
+	.pipe( $.autoprefixer({
+		browsers: COMPATIBILITY
+	}) )
+     // Save to development or sources destination folders 
+    .pipe( $.multistream.apply(undefined, dev_destination) )
+     // Minify and save to production destination folders if this is a production run
+    .pipe( $.cond(PRODUCTION, $.cssnano() ) )
+    .pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
+    .pipe( $.cond(PRODUCTION, $.extname(CSS_EXT) ) )
+    .pipe( $.cond(PRODUCTION, $.multistream.apply(undefined, prod_destination) ) );
 });
 
 // Process Glypicon Font Files
@@ -583,7 +655,7 @@ GULP.task('javascript', ['plugins'], function() {
   return STREAM.concat(
   
     // ZEN CART CATALOG JS FILES 
-    GULP.src(['src/assets/javascript-catalog/**/*.js'])
+    GULP.src(['src/assets/zc_catalog/javascript/**/*.js'])
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(catalog_dir) )
       // Minify and save to production destination folders if this is a production run
@@ -593,7 +665,7 @@ GULP.task('javascript', ['plugins'], function() {
       .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/jscript') ) ),
       
     // ZEN CART ADMIN JS FILES 
-    GULP.src(['src/assets/javascript-admin/**/*.js'])
+    GULP.src(['src/assets/zc_admin/javascript/**/*.js'])
       // Save to development or sources folders depending on whether this is a production run or not
       .pipe( GULP.dest(admin_dir) )
       // Minify and save to production destination folders if this is a production run
@@ -688,11 +760,15 @@ GULP.task('javascript', ['plugins'], function() {
 ********************************/
 // Copy image files to the "zencart" folder
 GULP.task('images', function() {
-  var retval;	
-  retval = GULP.src(['src/assets/images/**/*'])
-   .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/images') ) )
-   .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_ADMIN_DEV + '/images') ) );
-   
+  var retval;
+    retval = STREAM.concat(
+      GULP.src(['src/assets/zc_admin/images/**/*'])
+        .pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/images') ) )
+        .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_ADMIN_DEV + '/images') ) ),
+      GULP.src(['src/assets/zc_catalog/images/**/*'])
+        .pipe( $.cond(PRODUCTION, GULP.dest(DIST_CATALOG_PROD + '/images') ) )
+        .pipe( $.cond(!PRODUCTION, GULP.dest(DIST_CATALOG_DEV + '/images') ) )
+    );
   if (!PRODUCTION) {  
     retval = retval + GULP.src(['src/AdminLTE/assets/img/**/*'])
   	  .pipe( GULP.dest(DIST_DEMO_DEV + '/images') );
@@ -760,8 +836,8 @@ GULP.task('copy:font', function() {
 GULP.task('default', ['server'], function() {
   GULP.watch(PATHS.assets, ['copy', BROWSER.reload]);
   GULP.watch(['src/index.html'], ['pages', BROWSER.reload]);
-  GULP.watch(['src/assets/scss/**/*.scss'], ['stylesheet', BROWSER.reload]);  
-  GULP.watch(['src/assets/javascript/**/*.js'], ['javascript', BROWSER.reload]);
+  GULP.watch(['src/assets/{zc_admin,zc_catalog}/scss/**/*.scss'], ['stylesheet', BROWSER.reload]);  
+  GULP.watch(['src/assets/{zc_admin,zc_catalog}/javascript/**/*.js'], ['javascript', BROWSER.reload]);
   GULP.watch(['src/assets/plugins/**/*'], ['plugins', BROWSER.reload]);
-  GULP.watch(['src/assets/images/**/*'], ['images', BROWSER.reload]);
+  GULP.watch(['src/assets/{zc_admin,zc_catalog}/images/**/*'], ['images', BROWSER.reload]);
 });
