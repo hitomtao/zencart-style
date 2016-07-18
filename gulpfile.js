@@ -47,14 +47,14 @@ const FONT_SASS='src/assets/scss/components/fonticon/**/scss/';
 const FONT_PATH='src/assets/scss/components/fonticon/**/fonts/**/*';
 
 // Misc filesystem paths
-const JS_DEV = 'dist/dev/js';
-const JS_SRC = 'dist/sources/js';
-const JS_DIST = 'dist/production/js';
+const JS_DEV = 'zencart/dev/js';
+const JS_SRC = 'zencart/sources/js';
+const JS_DIST = 'zencart/production/js';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
 const CSS_EXT = PRODUCTION ? '.min.css' : '.css';
 const JQ_URI = PRODUCTION ? JS_DIST : JS_DEV;
 const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="' 
-        + JQ_URI.replace('dist/','/') + '/jquery' + JS_EXT 
+        + JQ_URI.replace('zencart/','/') + '/jquery' + JS_EXT 
         + '"><\\/script>\');</script>';
 
 const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<script src="' 
@@ -92,7 +92,7 @@ const PATHS = {
 // Build the site
 GULP.task('build', function(done) {
   $.sequence(
-    ['clean:dist'], 
+    ['clean:zencart'], 
     ['pages', 'sass', 'javascript', 'images', 'copy'], 
   done);
 });
@@ -105,7 +105,7 @@ GULP.task('build', function(done) {
 // Start a server with LiveReload to preview the site
 GULP.task('server', ['build'], function() {
   BROWSER.init({
-    server: 'dist', port: DEV_PORT
+    server: 'zencart', port: DEV_PORT
   });
 });
 
@@ -114,9 +114,9 @@ GULP.task('server', ['build'], function() {
   * 04: PREP FOLDERS
   ****************************
 ********************************/
-// Remove the "dist" folder if it exists
-GULP.task('clean:dist', function(done) {
-  return REMOVE('dist/**');
+// Remove the "zencart" folder if it exists
+GULP.task('clean:zencart', function(done) {
+  return REMOVE('zencart/**');
 });
 
 /*******************************
@@ -129,8 +129,8 @@ GULP.task('pages', function(done) {
   var css_path = PRODUCTION ? '/production/css/' : '/dev/css/';
   var js_path = PRODUCTION ? '/production/js/' : '/dev/js/';
   
-  var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + '.min.js';
-  var jquery_migrate_js = PRODUCTION ? '': '//code.jquery.com/jquery-migrate-' + JQ_MIG + '.min.js';
+  var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + JS_EXT
+  var jquery_migrate_js = PRODUCTION ? '': '//code.jquery.com/jquery-migrate-' + JQ_MIG + JS_EXT;
   var jquery_migrate_fallback = PRODUCTION ? '': JM_WRITE;
   var demo_js = '/dev/js/demo.js' + CACHEFLAG;
   
@@ -163,7 +163,7 @@ GULP.task('pages', function(done) {
     }))
     .pipe(replace_html)
     .pipe($.prettify())
-    .pipe(GULP.dest('dist'));
+    .pipe(GULP.dest('zencart'));
 });
 
 // Rebuild HTML files
@@ -221,19 +221,19 @@ GULP.task('sass:bootstrap:compile', function() {
     .pipe($.sourcemaps.write())
     .pipe(
       $.cond(PRODUCTION, 
-        GULP.dest('dist/sources/css'), 
-        GULP.dest('dist/dev/css')
+        GULP.dest('zencart/sources/css'), 
+        GULP.dest('zencart/dev/css')
       )
     );
 });
 
 // Minify bootstrap CSS file for production build
 GULP.task('sass:bootstrap:minify', function() {
-  return GULP.src('dist/sources/css/bootstrap.css')
+  return GULP.src('zencart/sources/css/bootstrap.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
-    .pipe($.extname('.min.css'))
-    .pipe(GULP.dest('dist/production/css'));
+    .pipe($.extname(CSS_EXT))
+    .pipe(GULP.dest('zencart/production/css'));
 });
 
 // Compile zencart Sass into CSS
@@ -250,8 +250,8 @@ GULP.task('sass:zencart:compile', ['sass:demo:compile'], function() {
     .pipe($.sourcemaps.write())
     .pipe(
       $.cond(PRODUCTION, 
-        GULP.dest('dist/sources/css'), 
-        GULP.dest('dist/dev/css')
+        GULP.dest('zencart/sources/css'), 
+        GULP.dest('zencart/dev/css')
       )
     );
 });
@@ -270,18 +270,18 @@ GULP.task('sass:demo:compile', function() {
 	  	  	browsers: COMPATIBILITY
 	  	  }))
 	  	  .pipe($.sourcemaps.write())
-	  	  .pipe(GULP.dest('dist/dev/css'));
+	  	  .pipe(GULP.dest('zencart/dev/css'));
 	  }
 	return stream;
 });
 
 // Minify zencart CSS file for production build
 GULP.task('sass:zencart:minify', function() {
-  return GULP.src('dist/sources/css/zencart.css')
+  return GULP.src('zencart/sources/css/zencart.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
-    .pipe($.extname('.min.css'))
-    .pipe(GULP.dest('dist/production/css'));
+    .pipe($.extname(CSS_EXT))
+    .pipe(GULP.dest('zencart/production/css'));
 });
 
 
@@ -290,8 +290,8 @@ GULP.task('sass:glypicons:init', function(done) {
   return GULP.src(PATHS.glyphicons)
     .pipe(
       $.cond(PRODUCTION, 
-        GULP.dest('dist/production/fonts/bootstrap'), 
-        GULP.dest('dist/dev/fonts/bootstrap')
+        GULP.dest('zencart/production/fonts/bootstrap'), 
+        GULP.dest('zencart/dev/fonts/bootstrap')
       )
     );
 });
@@ -314,19 +314,19 @@ GULP.task('sass:fonticon:compile', function(done) {
     .pipe($.sourcemaps.write())
     .pipe(
       $.cond(PRODUCTION, 
-        GULP.dest('dist/sources/css'), 
-        GULP.dest('dist/dev/css')
+        GULP.dest('zencart/sources/css'), 
+        GULP.dest('zencart/dev/css')
       )
     );
 });
 
 // Minify fonticon CSS file for production build
 GULP.task('sass:fonticon:minify', function() {
-  return GULP.src('dist/sources/css/fonticon.css')
+  return GULP.src('zencart/sources/css/fonticon.css')
     .pipe($.cssnano())
     .pipe($.replace('*/', '*/\n'))
-    .pipe($.extname('.min.css'))
-    .pipe(GULP.dest('dist/production/css'));
+    .pipe($.extname(CSS_EXT))
+    .pipe(GULP.dest('zencart/production/css'));
 });
 
 // Rebuild scss files
@@ -411,10 +411,10 @@ GULP.task('javascript:minify:zencart', function() {
   * 08: PROCESS IMAGE FILES
   ****************************
 ********************************/
-// Copy image files to the "dist" folder
+// Copy image files to the "zencart" folder
 GULP.task('images', function() {
   return GULP.src('src/assets/img/**/*')
-    .pipe(GULP.dest('dist/img'));
+    .pipe(GULP.dest('zencart/img'));
 });
 
 /*******************************
@@ -431,27 +431,27 @@ GULP.task('copy', function(done) {
   }
 });
 
-// Copy assets to "dist" folder
+// Copy assets to "zencart" folder
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:gen', function() {
   return GULP.src(PATHS.assets)
     .pipe(
       $.cond(PRODUCTION, 
-        GULP.dest('dist/production'), 
-        GULP.dest('dist/dev')
+        GULP.dest('zencart/production'), 
+        GULP.dest('zencart/dev')
       )
     );
 });
 
-// Copy assets to "dist/**/fonts" floder
+// Copy assets to "zencart/**/fonts" floder
 // Skips the "img", "js", and "scss" folders, which are parsed separately
 GULP.task('copy:font', function() {
   return GULP.src(FONT_PATH)
     .pipe($.flatten())
     .pipe(
       $.cond(PRODUCTION, 
-        GULP.dest('dist/production/fonts'), 
-        GULP.dest('dist/dev/fonts')
+        GULP.dest('zencart/production/fonts'), 
+        GULP.dest('zencart/dev/fonts')
       )
     );
 });
