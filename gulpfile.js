@@ -246,7 +246,7 @@ GULP.task( 'sass:demo:compile', function() {
 	return retvar;
 });
 
-// CSS build dispatcher
+// Compile extra CSS
 GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 	var admin_extra = GULP.src( ['src/assets/zc_admin/scss/zencart_admin.scss'] )
 		.pipe( $.sass()
@@ -368,8 +368,8 @@ GULP.task( 'javascript', function( done ) {
 				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
 			 ),
 			GULP.src( ['src/components/jquery/dist/jquery.min.js'] )
-				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) )
-				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) ),
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
 			
 		$.merge( app_extra, admin_extra )
 			.pipe( $.concat( 'admin-extra.js' ) )
