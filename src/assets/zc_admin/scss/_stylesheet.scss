@@ -1,0 +1,50 @@
+/*!
+ * @package admin
+ * @copyright Copyright 2003-2016 Zen Cart Development Team
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id: stylesheet.css  New in v1.6.0 $
+ */
+ 
+div.reportBox {
+    background: $gray-lighter;
+    border: 1px solid $gray-lighter;
+    margin-top: 1em;
+}
+
+.reportBox {
+	div.row:nth-of-type(2n) {
+		background-color: $gray-fainter;
+	}
+	div.row {
+		background: $gray-faint;
+		clear: both;
+		margin-top: 1px;
+		padding: 3px;
+		margin: 0px;
+		span.center {
+			margin-right: 30px;
+		}
+		span.left {
+			float: left;
+			text-align: left;
+			width: 74%;
+		}
+		span.right {
+			float: right;
+			text-align: right;
+			width: 34%;
+		}
+	}
+}
+
+.inputwrapper {
+  margin:5px 0;
+  padding:3px;
+}
+
+.copyrightrow {
+    clear: both;
+    font-size: 9px;
+    padding: 25px;
+    text-align: center; 
+} 
