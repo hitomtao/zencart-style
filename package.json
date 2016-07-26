@@ -34,7 +34,7 @@
     "gulp-cond": "^1.0.0",
     "gulp-cssnano": "^2.1.2",
     "gulp-extname": "^0.2.2",
-    "gulp-flatten": "^0.2.0",
+    "gulp-flatten": "^0.3.0",
     "gulp-html-replace": "^1.6.0",
     "gulp-inject-string": "^1.1.0",
     "gulp-load-plugins": "^1.2.4",
