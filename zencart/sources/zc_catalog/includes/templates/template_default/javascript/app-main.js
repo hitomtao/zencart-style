@@ -1,3 +1,6 @@
+/*! Fix Bootstrap/JQuery-UI conflicts | See http://stackoverflow.com/a/27745464/1233379 */
+'undefined'!=typeof $.ui&&($.widget.bridge('uibutton',$.ui.button),$.widget.bridge('uitooltip',$.ui.tooltip));
+
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.

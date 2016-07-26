@@ -39,6 +39,8 @@ const CACHEFLAG = '?' + Math.floor( Math.random()*900000 ) + 100000;
 // JQuery version
 const JQ_VER = '3.1.0';
 
+const UI_FIX = "/*! Fix Bootstrap/JQuery-UI conflicts | See http://stackoverflow.com/a/27745464/1233379 */\n'undefined'!=typeof $.ui&&($.widget.bridge('uibutton',$.ui.button),$.widget.bridge('uitooltip',$.ui.tooltip));\n\n";
+
 // Use additional font icons
 const FONT_SASS = 'src/fonts/**/scss/';
 const FONT_PATH = 'src/fonts/**/fonts/**/*';
@@ -340,7 +342,10 @@ GULP.task( 'javascript', function( done ) {
 			
 		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.js'] )
 			// Compile for development build
-			.pipe( $.concat( 'app-main.js' ) )
+			.pipe( $.rename( 'app-main.js' ) )
+			// Prepend functions to resolve Bootstrap/JQuery-UI conflicts
+			.pipe( $.injectString.prepend(UI_FIX) ) 
+			
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
@@ -349,13 +354,23 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_CATALOG_SRC + '/javascript' ), 
 				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
-			 )
-			// Minify file for production build
-			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			 ),
+			 
+		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.min.js'] )
+			// Compile for production build
+			.pipe( $.rename( 'app-main.min.js' ) )
+			// Prepend functions to resolve Bootstrap/JQuery-UI conflicts
+			.pipe( $.injectString.prepend(UI_FIX) ) 
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
+			
+		GULP.src( ['src/components/jquery-ui/jquery-ui.js'] )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
+				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
+			),
+			GULP.src( ['src/components/jquery-ui/jquery-ui.min.js'] )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
 			
 		GULP.src( ['src/components/jquery/dist/jquery.js'] )
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
