@@ -16,6 +16,7 @@
   ],
   "private": true,
   "devDependencies": {
-    "bootstrap-sass": "^3.3.7"
+    "bootstrap-sass": "^3.3.7",
+    "jquery-ui": "^1.12.0"
   }
 }
