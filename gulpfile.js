@@ -58,14 +58,11 @@ const CLEAN_UP = [
 // Misc filesystem paths
 const DIST_DEMO_DEV		= 'zencart/demo'
 const DIST_ADMIN_DEV	= 'zencart/dev/zc_admin/includes/template'
-const DIST_ADMIN_SRC	= 'zencart/sources/zc_admin/includes/template'
-const DIST_ADMIN_PROD	= 'zencart/production/zc_admin/includes/template'
+const DIST_ADMIN_SRC	= 'zencart/plaintext/zc_admin/includes/template'
+const DIST_ADMIN_PROD	= 'zencart/minified/zc_admin/includes/template'
 const DIST_CATALOG_DEV	= 'zencart/dev/zc_catalog/includes/templates/template_default'
-const DIST_CATALOG_SRC	= 'zencart/sources/zc_catalog/includes/templates/template_default'
-const DIST_CATALOG_PROD	= 'zencart/production/zc_catalog/includes/templates/template_default'
-
-const JS_EXT = PRODUCTION ? '.min.js' : '.js';
-const CSS_EXT = PRODUCTION ? '.min.css' : '.css';
+const DIST_CATALOG_SRC	= 'zencart/plaintext/zc_catalog/includes/templates/template_default'
+const DIST_CATALOG_PROD	= 'zencart/minified/zc_catalog/includes/templates/template_default'
 
 // File paths to various assets are defined here.
 const PATHS = {
@@ -154,11 +151,11 @@ GULP.task( 'pages', function( done ) {
 	var demo_css_file = demo_folder_path + '/css/bootswatch_demo.css' + CACHEFLAG;
 	var demo_img_file = demo_folder_path + '/images/zen-cart.png' + CACHEFLAG;
   
-	var main_css_file = demo_css_path + 'app-main' + CSS_EXT + CACHEFLAG;
-	var main_js_file = demo_js_path + 'app-main' + JS_EXT + CACHEFLAG;
-	var extra_css_file = demo_css_path + 'app-extra' + CSS_EXT + CACHEFLAG;
-	var extra_js_file = demo_js_path + 'app-extra' + JS_EXT + CACHEFLAG;
-	var fonts_css_file = demo_css_path + 'app-fonts' + CSS_EXT + CACHEFLAG;
+	var main_css_file = demo_css_path + 'app-main.css' + CACHEFLAG;
+	var main_js_file = demo_js_path + 'app-main.js' + CACHEFLAG;
+	var extra_css_file = demo_css_path + 'app-extra.css' + CACHEFLAG;
+	var extra_js_file = demo_js_path + 'app-extra.js' + CACHEFLAG;
+	var fonts_css_file = demo_css_path + 'app-fonts.css' + CACHEFLAG;
   
 	var replace_html = $.htmlReplace( {
 		'jquery_js': jquery_js_file,
@@ -230,7 +227,7 @@ GULP.task( 'sass:main:compile', function() {
 		// Minify main CSS file for production build
 		.pipe( $.cond( PRODUCTION, $.cssnano() ) )
 		.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-		.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+		.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 		.pipe( $.cond( PRODUCTION, $.multistream.apply( undefined, prod_destination ) ) );
 });
 
@@ -277,7 +274,7 @@ GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 			 ) ),
 		$.merge( app_extra, admin_extra )
 			.pipe( $.cond( PRODUCTION, $.cssnano() ) )
-			.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra' + CSS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra.min.css' ) ) )
 			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) ),
 	
@@ -289,7 +286,7 @@ GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 			 ) ),
 		$.merge( app_extra, catalog_extra )
 			.pipe( $.cond( PRODUCTION, $.cssnano() ) )
-			.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra' + CSS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra.min.css' ) ) )
 			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) )
 	 );
@@ -318,7 +315,7 @@ GULP.task( 'sass:fonts:compile', function( done ) {
          // Minify app-fonts CSS file for production build
 		.pipe( $.cond( PRODUCTION, $.cssnano() ) )
 		.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-		.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+		.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) )
 		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) );
 });
@@ -392,7 +389,7 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) ),
 			$.merge( app_extra, admin_extra )
 				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-				.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra' + JS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra.min.js' ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
 			
@@ -402,7 +399,7 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) ),
 			$.merge( app_extra, catalog_extra )
 				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-				.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra' + JS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra.min.js' ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) )
 	 );
@@ -481,7 +478,7 @@ GULP.task( 'copy:plugins', function() {
     			.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2' ) )
 				.pipe( $.uglify( {preserveComments:"license"} ) )
 				.pipe( $.batchReplace( CLEAN_UP ) )
-				.pipe( $.extname( JS_EXT ) )
+				.pipe( $.extname( '.min.js' ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
 				
 			// Save Select2 plugin localisation js files to production destination folders
@@ -499,7 +496,7 @@ GULP.task( 'copy:plugins', function() {
 				// Minify and save to production destination folder if this is a production run
 				.pipe( $.cond( PRODUCTION, $.cssnano() ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-				.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
 				
 			// Minify and save daterangepicker plugin js files to production destination folders
@@ -507,7 +504,7 @@ GULP.task( 'copy:plugins', function() {
 				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/daterangepicker' ) )
 				.pipe( $.uglify( {preserveComments:"license"} ) )
 				.pipe( $.batchReplace( CLEAN_UP ) )
-				.pipe( $.extname( JS_EXT ) )
+				.pipe( $.extname( '.min.js' ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
 				
 			// Minify and save daterangepicker plugin css files to production destination folders
@@ -520,7 +517,7 @@ GULP.task( 'copy:plugins', function() {
 				// Minify and save to production destination folder if this is a production run
 				.pipe( $.cond( PRODUCTION, $.cssnano() ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-				.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
 				
 			// Minify and save moment plugin js files to production destination folders
@@ -528,7 +525,7 @@ GULP.task( 'copy:plugins', function() {
 				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/moment' ) )
 				.pipe( $.uglify( {preserveComments:"license"} ) )
 				.pipe( $.batchReplace( CLEAN_UP ) )
-				.pipe( $.extname( JS_EXT ) )
+				.pipe( $.extname( '.min.js' ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/moment' ) ),
 				
 			// Minify and save gridstack plugin js files to production destination folders
@@ -538,7 +535,7 @@ GULP.task( 'copy:plugins', function() {
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/gridstack' ) ) )
 				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-				.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) ) ),
 				
 			// Minify and save gridstack plugin css files to production destination folders
@@ -551,7 +548,7 @@ GULP.task( 'copy:plugins', function() {
 				// Minify and save to production destination folder if this is a production run
 				.pipe( $.cond( PRODUCTION, $.cssnano() ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-				.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) )
 		 ); 
 	}
@@ -567,7 +564,7 @@ GULP.task( 'copy:plugins', function() {
 			// Minify and save to production destination folders
 			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
 			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) ),
 			
 		// Flot Plugin Extensions
@@ -582,7 +579,7 @@ GULP.task( 'copy:plugins', function() {
 			// Minify and save to production destination folders
 			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
 			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) )
   ); 
   return retval;
