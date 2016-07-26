@@ -36,9 +36,8 @@ const COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 // Random cache buster
 const CACHEFLAG = '?' + Math.floor( Math.random()*900000 ) + 100000;
 
-// JQuery & JQuery Migrate versions
-const JQ_VER = '2.2.4';
-const JQ_MIG = '1.4.1';
+// JQuery version
+const JQ_VER = '3.1.0';
 
 // Use additional font icons
 const FONT_SASS = 'src/fonts/**/scss/';
@@ -63,17 +62,8 @@ const DIST_CATALOG_DEV	= 'zencart/dev/zc_catalog/includes/templates/template_def
 const DIST_CATALOG_SRC	= 'zencart/sources/zc_catalog/includes/templates/template_default'
 const DIST_CATALOG_PROD	= 'zencart/production/zc_catalog/includes/templates/template_default'
 
-
-
-const JS_DEV = 'zencart/dev/javascript';
-const JS_SRC = 'zencart/sources/javascript';
-const JS_DIST = 'zencart/production/javascript';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
 const CSS_EXT = PRODUCTION ? '.min.css' : '.css';
-const JQ_URI = PRODUCTION ? JS_DIST : JS_DEV;
-const JQ_WRITE = '<script>window.jQuery || document.write( \'<script src="' 
-        + JQ_URI.replace( 'zencart/','/' ) + '/jquery' + JS_EXT 
-        + '"><\\/script>\' );</script>';
 
 // File paths to various assets are defined here.
 const PATHS = {
@@ -153,31 +143,31 @@ GULP.task( 'clean:zencart', function( done ) {
 ********************************/
 // HTML build dispatcher
 GULP.task( 'pages', function( done ) {
-	var css_path = PRODUCTION ? '/production/css/' : '/demo/css/';
-	var js_path = PRODUCTION ? '/production/javascript/' : '/demo/javascript/';
-	var demo_path = DIST_DEMO_DEV.replace( 'zencart/','/' );
+	var demo_css_path = '/demo/css/';
+	var demo_js_path = '/demo/javascript/';
+	var demo_folder_path = DIST_DEMO_DEV.replace( 'zencart/','/' );
  
-	var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + JS_EXT
-	var demo_js = demo_path + '/javascript/bootswatch_demo.js' + CACHEFLAG;
-	var demo_css = demo_path + '/css/bootswatch_demo.css' + CACHEFLAG;
-	var demo_img = demo_path + '/images/zen-cart.png' + CACHEFLAG;
+	var jquery_js_file = demo_folder_path + '/javascript/jquery.js' + CACHEFLAG;
+	var demo_js_file = demo_folder_path + '/javascript/bootswatch_demo.js' + CACHEFLAG;
+	var demo_css_file = demo_folder_path + '/css/bootswatch_demo.css' + CACHEFLAG;
+	var demo_img_file = demo_folder_path + '/images/zen-cart.png' + CACHEFLAG;
   
-	var main_css = css_path + 'app-main' + CSS_EXT + CACHEFLAG;
-	var main_js = js_path + 'app-main' + JS_EXT + CACHEFLAG;
-	var extra_css = css_path + 'app-extra' + CSS_EXT + CACHEFLAG;
-	var extra_js = js_path + 'app-extra' + JS_EXT + CACHEFLAG;
-	var fonts_css = css_path + 'app-fonts' + CSS_EXT + CACHEFLAG;
+	var main_css_file = demo_css_path + 'app-main' + CSS_EXT + CACHEFLAG;
+	var main_js_file = demo_js_path + 'app-main' + JS_EXT + CACHEFLAG;
+	var extra_css_file = demo_css_path + 'app-extra' + CSS_EXT + CACHEFLAG;
+	var extra_js_file = demo_js_path + 'app-extra' + JS_EXT + CACHEFLAG;
+	var fonts_css_file = demo_css_path + 'app-fonts' + CSS_EXT + CACHEFLAG;
   
 	var replace_html = $.htmlReplace( {
-		'jquery_js': JQ_WRITE,
-		'main_js': main_js,
-		'main_css': main_css,
-		'extra_js': extra_js,
-		'extra_css': extra_css,
-		'demo_js': demo_js,
-		'demo_css': demo_css,
-		'demo_img': demo_img,
-		'fonts_css': fonts_css,
+		'jquery_js': jquery_js_file,
+		'main_js': main_js_file,
+		'main_css': main_css_file,
+		'extra_js': extra_js_file,
+		'extra_css': extra_css_file,
+		'demo_js': demo_js_file,
+		'demo_css': demo_css_file,
+		'demo_img': demo_img_file,
+		'fonts_css': fonts_css_file,
 	});
 	
 	return GULP.src( 'src/index.html' )
@@ -256,7 +246,7 @@ GULP.task( 'sass:demo:compile', function() {
 	return retvar;
 });
 
-// CSS build dispatcher
+// Compile extra CSS
 GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 	var admin_extra = GULP.src( ['src/assets/zc_admin/scss/zencart_admin.scss'] )
 		.pipe( $.sass()
@@ -367,9 +357,8 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
 			
-		GULP.src( ['src/components/jquery-' + JQ_VER + '/index.js'] )
-			.pipe( $.rename( 'jquery.js' ) )
-			.pipe( GULP.dest( DIST_DEMO_DEV + '/javascript' ) )
+		GULP.src( ['src/components/jquery/dist/jquery.js'] )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
 				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
@@ -377,32 +366,30 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_CATALOG_SRC + '/javascript' ), 
 				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
-			 )
-			// Minify "jquery" JS file for production build
-			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
+			 ),
+			GULP.src( ['src/components/jquery/dist/jquery.min.js'] )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
 			
 		$.merge( app_extra, admin_extra )
 			.pipe( $.concat( 'admin-extra.js' ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/javascript' ) ) )
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) ),
-		$.merge( app_extra, admin_extra )
-			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-			.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra' + JS_EXT ) ) )
-			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
+			$.merge( app_extra, admin_extra )
+				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra' + JS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
 			
 		$.merge( app_extra, catalog_extra )
 			.pipe( $.concat( 'catalog-extra.js' ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_SRC + '/javascript' ) ) )
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) ),
-		$.merge( app_extra, catalog_extra )
-			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-			.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra' + JS_EXT ) ) )
-			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) )
+			$.merge( app_extra, catalog_extra )
+				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra' + JS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) )
 	 );
 });
 
