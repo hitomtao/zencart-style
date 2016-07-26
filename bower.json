@@ -1,0 +1,21 @@
+{
+  "name": "zencart-style",
+  "homepage": "https://github.com/dakanji/zencart-style",
+  "authors": [
+    "Dayo Akanji <dakanji@user.noreply.github.com>"
+  ],
+  "description": "Bootstrap Based CSS and JS for Zencart",
+  "main": "gulpfile.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/components",
+    "test",
+    "tmp"
+  ],
+  "private": true,
+  "devDependencies": {
+    "bootstrap-sass": "^3.3.7”
+  }
+}
