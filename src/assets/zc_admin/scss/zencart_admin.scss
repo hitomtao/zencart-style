@@ -1,0 +1,8 @@
+@charset 'utf-8';
+
+// Override Core Variables
+@import "src/bootswatch/scss/themes/paper/variables";
+@import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+
+// CSS Overrides
+@import "stylesheet";

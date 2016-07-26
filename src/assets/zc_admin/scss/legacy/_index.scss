@@ -1,0 +1,27 @@
+.widget-row
+{
+  margin-right: 0;
+  margin-left: 0;
+}
+.widget-row:nth-child(even) {
+  background-color:#f3f3ee;
+}
+.widget-body
+{
+  clear: both;
+  background-color: #F7F9FA;
+  padding: 2px;
+  /*margin: 1px;*/
+  font-size: 15px;
+  color: #666;
+}
+.widget-body a
+{
+  font-size: 15px;
+}
+.ui-sortable-placeholder {
+  border: 1px solid red;
+  background-color: lightblue;
+  height: auto;
+}
+

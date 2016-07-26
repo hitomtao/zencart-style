@@ -1,0 +1,29 @@
+[id="home"] {
+  padding-top: 0; }
+  [id="home"] .navbar-brand {
+    padding: 13.5px 15px 12.5px; }
+  [id="home"] .navbar-brand > img {
+    display: inline;
+    height: 100%;
+    margin: 0 10px; }
+
+[id="banner"] {
+  border-bottom: none;
+  min-height: 300px; }
+
+@media (max-width: 767px) {
+  [id="banner"] {
+    margin-bottom: 2em;
+    text-align: center; } }
+
+.page-header h1,
+.page-header-noborder h1 {
+  font-size: 4em; }
+
+.page-header-noborder {
+  border: 0;
+  margin: 46px 0 23px;
+  padding-bottom: 10.5px; }
+
+.table-of-contents {
+  margin-top: 1em; }

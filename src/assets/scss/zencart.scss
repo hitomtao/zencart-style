@@ -1,9 +1,0 @@
-@charset 'utf-8';
-
-// Override Core Variables
-@import "components/bootstrap_theme/light/variables";
-@import "src/components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
-
-// CSS Overrides
-@import "components/bootstrap_theme/light/bootswatch";
-@import "components/bootstrap_theme/light/overrides";

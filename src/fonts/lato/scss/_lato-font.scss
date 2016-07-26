@@ -1,0 +1,17 @@
+// Lato Font Path
+// --------------------------
+
+// FontFace =====================================================================
+
+/* Webfont: #{$lato-regular-name} */
+@font-face {
+    font-family: 'LatoWeb';
+    src: url("#{$lato-font-path}/#{$lato-regular-name}.eot");
+    src: url("#{$lato-font-path}/#{$lato-regular-name}.eot?#iefix") format("embedded-opentype"),
+         url("#{$lato-font-path}/#{$lato-regular-name}.woff2") format("woff2"),
+         url("#{$lato-font-path}/#{$lato-regular-name}.woff") format("woff"),
+         url("#{$lato-font-path}/#{$lato-regular-name}.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}

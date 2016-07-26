@@ -8,25 +8,24 @@
   * 01: SET CONSTANTS
   ****************************
 ********************************/
-const $              = require('gulp-load-plugins')();
-const GULP           = require('gulp');
-const ARGV           = require('yargs').argv;
-const REMOVE         = require('del');
-const PANINI         = require('panini');
-const EVENTS         = require('event-stream');
-const BROWSER        = require('browser-sync');
+const $              = require( 'gulp-load-plugins' )();
+const GULP           = require( 'gulp' );
+const ARGV           = require( 'yargs' ).argv;
+const REMOVE         = require( 'del' );
+const STREAM         = require( 'event-stream' );
+const BROWSER        = require( 'browser-sync' );
 const CSS_PROCESS    = [
-  require('postcss-normalize-charset'),
-  require('postcss-remove-prefixes'), 
-  require('postcss-ordered-values'),
-  require('postcss-merge-rules'), 
-  require('postcss-fakeid'),
-  require('css-declaration-sorter')
+  require( 'postcss-normalize-charset' ),
+  require( 'postcss-remove-prefixes' ), 
+  require( 'postcss-ordered-values' ),
+  require( 'postcss-merge-rules' ), 
+  require( 'postcss-fakeid' ),
+  require( 'css-declaration-sorter' )
 ];
 
 
 // Flag whether to build for production
-const PRODUCTION = !!(ARGV.production);
+const PRODUCTION = !!( ARGV.production );
 
 // Port to use for the development server.
 const DEV_PORT = 8000;
@@ -35,53 +34,81 @@ const DEV_PORT = 8000;
 const COMPATIBILITY = ['last 2 versions', 'ie >= 9'];
 
 // Random cache buster
-const CACHEFLAG      = '?' + Math.floor(Math.random()*900000) + 100000;
+const CACHEFLAG = '?' + Math.floor( Math.random()*900000 ) + 100000;
 
 // JQuery & JQuery Migrate versions
 const JQ_VER = '2.2.4';
 const JQ_MIG = '1.4.1';
 
 // Use additional font icons
-const FONT_ICONS = true;
-const FONT_SASS='src/assets/scss/components/fonticon/**/scss/';
-const FONT_PATH='src/assets/scss/components/fonticon/**/fonts/**/*';
+const FONT_SASS = 'src/fonts/**/scss/';
+const FONT_PATH = 'src/fonts/**/fonts/**/*';
+
+// Ensure license information shows up clearly in minified files.			
+const CLEAN_UP = [
+		['*/', '*/\n'],
+		['\n\n', '\n'],
+		[',/*', ',\n\n/*'],
+		[';/*', ';\n\n/*'],
+		[' )/*', ' )\n\n/*'],
+		[new RegExp( '( [a-zA-Z0-9_$] )' ) + '/*', '\n/*']
+	];	
 
 // Misc filesystem paths
-const JS_DEV = 'zencart/dev/js';
-const JS_SRC = 'zencart/sources/js';
-const JS_DIST = 'zencart/production/js';
+const DIST_DEMO_DEV		= 'zencart/demo'
+const DIST_ADMIN_DEV	= 'zencart/dev/zc_admin/includes/template'
+const DIST_ADMIN_SRC	= 'zencart/sources/zc_admin/includes/template'
+const DIST_ADMIN_PROD	= 'zencart/production/zc_admin/includes/template'
+const DIST_CATALOG_DEV	= 'zencart/dev/zc_catalog/includes/templates/template_default'
+const DIST_CATALOG_SRC	= 'zencart/sources/zc_catalog/includes/templates/template_default'
+const DIST_CATALOG_PROD	= 'zencart/production/zc_catalog/includes/templates/template_default'
+
+
+
+const JS_DEV = 'zencart/dev/javascript';
+const JS_SRC = 'zencart/sources/javascript';
+const JS_DIST = 'zencart/production/javascript';
 const JS_EXT = PRODUCTION ? '.min.js' : '.js';
 const CSS_EXT = PRODUCTION ? '.min.css' : '.css';
 const JQ_URI = PRODUCTION ? JS_DIST : JS_DEV;
-const JQ_WRITE = '<script>window.jQuery || document.write(\'<script src="' 
-        + JQ_URI.replace('zencart/','/') + '/jquery' + JS_EXT 
-        + '"><\\/script>\');</script>';
-
-const JM_WRITE = '<script>window.jQuery.migrateVersion || document.write(\'<script src="' 
-        + '/dev/js/jquery-migrate.js"><\\/script>\');</script>';
+const JQ_WRITE = '<script>window.jQuery || document.write( \'<script src="' 
+        + JQ_URI.replace( 'zencart/','/' ) + '/jquery' + JS_EXT 
+        + '"><\\/script>\' );</script>';
 
 // File paths to various assets are defined here.
 const PATHS = {
-  demo_js: [
-    'src/assets/js/demopage/**/*.js'
-  ],
-  assets: [
-    'src/assets/**/*',
-    '!src/assets/{img,js,scss}/**/*',
-    '!src/assets/{img,js,scss}/**/',
-    '!src/assets/{img,js,scss}/'
-  ],
-  js_zencart: [
-    'src/assets/js/**/*.js',
-    '!src/assets/js/demopage/**/*.js'
-  ],
-  sass_fonticon_include: [
-    FONT_SASS,
-    'src/assets/scss/components/fonticon/foundation-icons/scss/'
-  ],
-  glyphicons: [
-    'src/components/bootstrap-sass/assets/fonts/bootstrap/**/*'
-  ]
+	assets: [
+		'src/assets/{zc_admin,zc_catalog}/**/*',
+		'!src/assets/{zc_admin,zc_catalog}/{images,javascript,scss}/**/*',
+		'!src/assets/{zc_admin,zc_catalog}/{images,javascript,scss}/**/',
+		'!src/assets/{zc_admin,zc_catalog}/{images,javascript,scss}/'
+	],
+	js_plugins: [
+		'src/assets/plugins/**/*',
+		'!src/assets/plugins/flot/**/*',
+		'!src/assets/plugins/flot/**/',
+		'!src/assets/plugins/flot/',
+		'!src/assets/plugins/input-mask/**/*',
+		'!src/assets/plugins/input-mask/**/',
+		'!src/assets/plugins/input-mask/',
+	],
+	flot_plugins: [
+		'src/assets/plugins/flot/**/*.js',
+		'!src/assets/plugins/flot/jquery.flot.js',
+		'!src/assets/plugins/flot/excanvas.js',
+	],
+	inputmask_extensions: [
+		'src/assets/plugins/input-mask/**/*.js',
+		'!src/assets/plugins/input-mask/jquery.inputmask.js',
+	],
+	js_extra: [
+		'src/bootswatch/javascript/**/*.js',
+		'!src/bootswatch/javascript/bootswatch_demo.js'
+	],
+	sass_fonts_include: [
+		FONT_SASS,
+		'src/fonts/foundation-icons/scss/'
+	]
 };
 
 /*******************************
@@ -90,11 +117,11 @@ const PATHS = {
   ****************************
 ********************************/
 // Build the site
-GULP.task('build', function(done) {
-  $.sequence(
-    ['clean:zencart'], 
-    ['pages', 'sass', 'javascript', 'images', 'copy'], 
-  done);
+GULP.task( 'build', function( done ) {
+	$.sequence( 
+		['clean:zencart'],
+		['pages', 'sass', 'javascript', 'images', 'copy'],
+	done );
 });
 
 /*******************************
@@ -103,10 +130,10 @@ GULP.task('build', function(done) {
   ****************************
 ********************************/
 // Start a server with LiveReload to preview the site
-GULP.task('server', ['build'], function() {
-  BROWSER.init({
-    server: 'zencart', port: DEV_PORT
-  });
+GULP.task( 'server', ['build'], function() {
+	BROWSER.init( {
+		server: 'zencart', port: DEV_PORT
+	});
 });
 
 /*******************************
@@ -115,8 +142,8 @@ GULP.task('server', ['build'], function() {
   ****************************
 ********************************/
 // Remove the "zencart" folder if it exists
-GULP.task('clean:zencart', function(done) {
-  return REMOVE('zencart/**');
+GULP.task( 'clean:zencart', function( done ) {
+	return REMOVE( 'zencart/**' );
 });
 
 /*******************************
@@ -125,56 +152,43 @@ GULP.task('clean:zencart', function(done) {
   ****************************
 ********************************/
 // HTML build dispatcher
-GULP.task('pages', function(done) {
-  var css_path = PRODUCTION ? '/production/css/' : '/dev/css/';
-  var js_path = PRODUCTION ? '/production/js/' : '/dev/js/';
+GULP.task( 'pages', function( done ) {
+	var css_path = PRODUCTION ? '/production/css/' : '/demo/css/';
+	var js_path = PRODUCTION ? '/production/javascript/' : '/demo/javascript/';
+	var demo_path = DIST_DEMO_DEV.replace( 'zencart/','/' );
+ 
+	var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + JS_EXT
+	var demo_js = demo_path + '/javascript/bootswatch_demo.js' + CACHEFLAG;
+	var demo_css = demo_path + '/css/bootswatch_demo.css' + CACHEFLAG;
+	var demo_img = demo_path + '/images/zen-cart.png' + CACHEFLAG;
   
-  var jquery_js = '//code.jquery.com/jquery-' + JQ_VER + JS_EXT
-  var jquery_migrate_js = PRODUCTION ? '': '//code.jquery.com/jquery-migrate-' + JQ_MIG + JS_EXT;
-  var jquery_migrate_fallback = PRODUCTION ? '': JM_WRITE;
-  var demo_js = '/dev/js/demo.js' + CACHEFLAG;
+	var main_css = css_path + 'app-main' + CSS_EXT + CACHEFLAG;
+	var main_js = js_path + 'app-main' + JS_EXT + CACHEFLAG;
+	var extra_css = css_path + 'app-extra' + CSS_EXT + CACHEFLAG;
+	var extra_js = js_path + 'app-extra' + JS_EXT + CACHEFLAG;
+	var fonts_css = css_path + 'app-fonts' + CSS_EXT + CACHEFLAG;
   
-  var bootstrap_css = css_path + 'bootstrap' + CSS_EXT + CACHEFLAG;
-  var bootstrap_js = js_path + 'bootstrap' + JS_EXT + CACHEFLAG;
-  var zencart_css = css_path + 'zencart' + CSS_EXT + CACHEFLAG;
-  var zencart_js = js_path + 'zencart' + JS_EXT + CACHEFLAG;
-  var fonticon_css = !FONT_ICONS ? '' : css_path + 'fonticon' + CSS_EXT + CACHEFLAG;
-  
-  var replace_html = $.htmlReplace({
-    'jquery_js': jquery_js,
-    'jquery_fallback': JQ_WRITE,
-    'jquery_migrate_js': jquery_migrate_js,
-    'jquery_migrate_fallback': jquery_migrate_fallback,
-    'bootstrap_js': bootstrap_js,
-    'zencart_js': zencart_js, 
-    'demo_js': demo_js, 
-    'bootstrap_css': bootstrap_css,
-    'zencart_css': zencart_css,
-    'fonticon_css': fonticon_css,
-  });
+	var replace_html = $.htmlReplace( {
+		'jquery_js': JQ_WRITE,
+		'main_js': main_js,
+		'main_css': main_css,
+		'extra_js': extra_js,
+		'extra_css': extra_css,
+		'demo_js': demo_js,
+		'demo_css': demo_css,
+		'demo_img': demo_img,
+		'fonts_css': fonts_css,
+	});
 	
-  return GULP.src('src/pages/**/*.{html,hbs,handlebars}')
-    .pipe(PANINI({
-      root: 'src/pages/',
-      layouts: 'src/layouts/',
-      partials: 'src/partials/',
-      data: 'src/data/',
-      helpers: 'src/helpers/'
-    }))
-    .pipe(replace_html)
-    .pipe($.prettify())
-    .pipe(GULP.dest('zencart'));
+	return GULP.src( 'src/index.html' )
+		.pipe( replace_html )
+		.pipe( $.prettify() )
+		.pipe( GULP.dest( 'zencart' ) );
 });
 
 // Rebuild HTML files
-GULP.task('pages:reset', function(done) {
-  PANINI.refresh();
-  $.sequence('pages:regen', done);
-});
-
-// Rebuild HTML files
-GULP.task('pages:regen', function(done) {
-  $.sequence(['pages', 'sass'], done);
+GULP.task( 'pages:regen', function( done ) {
+	$.sequence( ['pages', 'sass'], done );
 });
 
 /*******************************
@@ -183,155 +197,138 @@ GULP.task('pages:regen', function(done) {
   ****************************
 ********************************/
 // CSS build dispatcher
-GULP.task('sass', function(done) {
-  if(PRODUCTION && FONT_ICONS){
-    $.sequence(
-      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
-      ['sass:bootstrap:minify', 'sass:fonticon:compile'], 
-      ['sass:zencart:minify', 'sass:fonticon:minify'], 
-    done);
-  } else if(!PRODUCTION && FONT_ICONS){
-    $.sequence(
-      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
-      ['sass:fonticon:compile'], 
-    done);
-  } else if(PRODUCTION && !FONT_ICONS){
-    $.sequence(
-      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
-      ['sass:bootstrap:minify', 'sass:zencart:minify'], 
-    done);
-  } else {
-    $.sequence(
-      ['sass:bootstrap:compile', 'sass:zencart:compile', 'sass:glypicons:init'], 
-    done);
-  }
+GULP.task( 'sass', function( done ) {
+	$.sequence( 
+	[
+		'sass:main:compile', 
+		'sass:extra:compile', 
+		'sass:fonts:compile' 
+	], done );
 });
 
-// Compile bootstrap Sass into CSS
-GULP.task('sass:bootstrap:compile', function() {
+// Compile main Sass into CSS
+GULP.task( 'sass:main:compile', function() {
+	var dev_destination = [];
+	var prod_destination = [];
+	if( PRODUCTION ) {
+		dev_destination.push( 
+			GULP.dest( DIST_ADMIN_SRC + '/css' ),
+			GULP.dest( DIST_CATALOG_SRC + '/css' )
+		 );
+		prod_destination.push( 
+			GULP.dest( DIST_ADMIN_PROD + '/css' ), 
+			GULP.dest( DIST_CATALOG_PROD + '/css' )
+		 );
+	} else {
+		dev_destination.push( 
+			GULP.dest( DIST_DEMO_DEV + '/css' ), 
+			GULP.dest( DIST_ADMIN_DEV + '/css' ), 
+			GULP.dest( DIST_CATALOG_DEV + '/css' )
+		 );
+	}
 	
-  return GULP.src('src/assets/scss/bootstrap.scss')
-    .pipe($.sourcemaps.init())
-    .pipe($.sass()
-      .on('error', $.sass.logError))
-    .pipe($.postcss(CSS_PROCESS))
-    .pipe($.autoprefixer({
-      browsers: COMPATIBILITY
-    }))
-    .pipe($.sourcemaps.write())
-    .pipe(
-      $.cond(PRODUCTION, 
-        GULP.dest('zencart/sources/css'), 
-        GULP.dest('zencart/dev/css')
-      )
-    );
-});
-
-// Minify bootstrap CSS file for production build
-GULP.task('sass:bootstrap:minify', function() {
-  return GULP.src('zencart/sources/css/bootstrap.css')
-    .pipe($.cssnano())
-    .pipe($.replace('*/', '*/\n'))
-    .pipe($.extname(CSS_EXT))
-    .pipe(GULP.dest('zencart/production/css'));
-});
-
-// Compile zencart Sass into CSS
-GULP.task('sass:zencart:compile', ['sass:demo:compile'], function() {
-	
-  return GULP.src('src/assets/scss/zencart.scss')
-    .pipe($.sourcemaps.init())
-    .pipe($.sass()
-      .on('error', $.sass.logError))
-    .pipe($.postcss(CSS_PROCESS))
-    .pipe($.autoprefixer({
-      browsers: COMPATIBILITY
-    }))
-    .pipe($.sourcemaps.write())
-    .pipe(
-      $.cond(PRODUCTION, 
-        GULP.dest('zencart/sources/css'), 
-        GULP.dest('zencart/dev/css')
-      )
-    );
+	return GULP.src( 'src/bootswatch/scss/bootstrap.scss' )
+		.pipe( $.sass()
+			.on( 'error', $.sass.logError ) )
+		.pipe( $.rename( 'app-main.css' ) )
+		.pipe( $.postcss( CSS_PROCESS ) )
+		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+		.pipe( $.multistream.apply( undefined, dev_destination ) )
+		
+		// Minify main CSS file for production build
+		.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+		.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+		.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+		.pipe( $.cond( PRODUCTION, $.multistream.apply( undefined, prod_destination ) ) );
 });
 
 // Compile demo Sass into CSS
-GULP.task('sass:demo:compile', function() {
-
-	var stream;
-	  if (!PRODUCTION) {
-	  	stream = GULP.src('src/assets/scss/demo.scss')
-	  	  .pipe($.sourcemaps.init())
-	  	  .pipe($.sass()
-	  	    .on('error', $.sass.logError))
-	  	  .pipe($.postcss(CSS_PROCESS))
-	  	  .pipe($.autoprefixer({
-	  	  	browsers: COMPATIBILITY
-	  	  }))
-	  	  .pipe($.sourcemaps.write())
-	  	  .pipe(GULP.dest('zencart/dev/css'));
-	  }
-	return stream;
+GULP.task( 'sass:demo:compile', function() {
+	var retvar;
+	if( !PRODUCTION ) {
+		retvar = GULP.src( ['src/bootswatch/scss/bootswatch_demo.scss'] )
+			.pipe( $.sass()
+				.on( 'error', $.sass.logError ) )
+			.pipe( $.postcss( CSS_PROCESS ) )
+			.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+			.pipe( GULP.dest( DIST_DEMO_DEV + '/css' ) );
+	}
+	return retvar;
 });
 
-// Minify zencart CSS file for production build
-GULP.task('sass:zencart:minify', function() {
-  return GULP.src('zencart/sources/css/zencart.css')
-    .pipe($.cssnano())
-    .pipe($.replace('*/', '*/\n'))
-    .pipe($.extname(CSS_EXT))
-    .pipe(GULP.dest('zencart/production/css'));
-});
-
-
-GULP.task('sass:glypicons:init', function(done) {
+// CSS build dispatcher
+GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
+	var admin_extra = GULP.src( ['src/assets/zc_admin/scss/zencart_admin.scss'] )
+		.pipe( $.sass()
+			.on( 'error', $.sass.logError ) )
+		.pipe( $.postcss( CSS_PROCESS ) )
+		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) );
+	var catalog_extra = GULP.src( ['src/assets/zc_catalog/scss/zencart_catalog.scss'] )
+		.pipe( $.sass()
+			.on( 'error', $.sass.logError ) )
+		.pipe( $.postcss( CSS_PROCESS ) )
+		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) );
+	var app_extra = GULP.src( ['src/bootswatch/scss/bootswatch.scss'] )
+		.pipe( $.sass()
+			.on( 'error', $.sass.logError ) )
+		.pipe( $.postcss( CSS_PROCESS ) )
+		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+		.pipe( $.rename( 'app-extra.css' ) )
+		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/css' ) ) );
 	
-  return GULP.src(PATHS.glyphicons)
-    .pipe(
-      $.cond(PRODUCTION, 
-        GULP.dest('zencart/production/fonts/bootstrap'), 
-        GULP.dest('zencart/dev/fonts/bootstrap')
-      )
-    );
-});
-
-// Prep fonticon Sass
-GULP.task('sass:fonticon:compile', function(done) {
+	return STREAM.concat( 
+		$.merge( app_extra, admin_extra )
+			.pipe( $.concat( 'admin-extra.css' ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/css' ),
+				GULP.dest( DIST_ADMIN_DEV + '/css' ) 
+			 ) ),
+		$.merge( app_extra, admin_extra )
+			.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+			.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra' + CSS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) ),
 	
-  return GULP.src(FONT_SASS + '**/*.scss')
-    .pipe($.sourcemaps.init())
-    .pipe($.injectString.prepend("@import 'unit';\n\n"))
-    .pipe($.sass({
-      includePaths: PATHS.sass_fonticon_include
-    }).on('error', $.sass.logError))
-    .pipe($.autoprefixer({
-      browsers: COMPATIBILITY
-    }))
-    .pipe($.flatten())
-    .pipe($.concat('fonticon.css'))
-    .pipe($.postcss(CSS_PROCESS))
-    .pipe($.sourcemaps.write())
-    .pipe(
-      $.cond(PRODUCTION, 
-        GULP.dest('zencart/sources/css'), 
-        GULP.dest('zencart/dev/css')
-      )
-    );
+		$.merge( app_extra, catalog_extra )
+			.pipe( $.concat( 'catalog-extra.css' ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_CATALOG_SRC + '/css' ),
+				GULP.dest( DIST_CATALOG_DEV + '/css' ) 
+			 ) ),
+		$.merge( app_extra, catalog_extra )
+			.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+			.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra' + CSS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) )
+	 );
 });
 
-// Minify fonticon CSS file for production build
-GULP.task('sass:fonticon:minify', function() {
-  return GULP.src('zencart/sources/css/fonticon.css')
-    .pipe($.cssnano())
-    .pipe($.replace('*/', '*/\n'))
-    .pipe($.extname(CSS_EXT))
-    .pipe(GULP.dest('zencart/production/css'));
-});
-
-// Rebuild scss files
-GULP.task('sass:regen', function(done) {
-  $.sequence('sass', done);
+// Prep fonts Sass
+GULP.task( 'sass:fonts:compile', function( done ) {
+	return GULP.src( [FONT_SASS + '**/*.scss'] )
+		.pipe( $.injectString.prepend( "@import 'unit';\n\n" ) )
+		.pipe( $.sass( {includePaths: PATHS.sass_fonts_include} )
+			.on( 'error', $.sass.logError ) )
+		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+		.pipe( $.flatten() )
+		.pipe( $.concat( 'app-fonts.css' ) )
+		.pipe( $.postcss( CSS_PROCESS ) )
+		.pipe( $.cond( PRODUCTION, 
+        	GULP.dest( DIST_ADMIN_SRC + '/css' ),
+        	GULP.dest( DIST_ADMIN_DEV + '/css' )
+        ) )
+		.pipe( $.cond( PRODUCTION, 
+        	GULP.dest( DIST_CATALOG_SRC + '/css' ),
+        	GULP.dest( DIST_CATALOG_DEV + '/css' )
+        ) )
+		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/css' ) ) )
+        
+         // Minify app-fonts CSS file for production build
+		.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+		.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+		.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) )
+		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) );
 });
 
 /*******************************
@@ -340,70 +337,73 @@ GULP.task('sass:regen', function(done) {
   ****************************
 ********************************/
 // JS build dispatcher
-GULP.task('javascript', function(done) {
-  if(PRODUCTION){
-    $.sequence(
-      ['javascript:compile'], 
-      ['javascript:minify:bootstrap', 'javascript:minify:zencart', 'javascript:minify:jquery'], 
-    done);
-  } else {
-    $.sequence('javascript:compile', done);
-  }
-});
-
-// Build various JS files
-GULP.task('javascript:compile', function() {
-
-  var target_dir = PRODUCTION ? JS_SRC : JS_DEV;
-  var stream = EVENTS.concat(
-    GULP.src('src/components/bootstrap-sass/assets/javascripts/bootstrap.js')
-      .pipe(GULP.dest(target_dir)),   
-    GULP.src(PATHS.js_zencart)
-      .pipe($.sourcemaps.init())
-      .pipe($.concat('zencart.js'))
-      .pipe($.sourcemaps.write())
-      .pipe(GULP.dest(target_dir)),
-    GULP.src(PATHS.demo_js)
-      .pipe($.sourcemaps.init())
-      .pipe($.concat('demo.js'))
-      .pipe($.sourcemaps.write())
-      .pipe(GULP.dest(target_dir)),
-    GULP.src('src/components/jquery-' + JQ_VER + '/index.js')
-      .pipe($.rename('jquery.js'))
-      .pipe(GULP.dest(target_dir)),
-    GULP.src('src/components/jquery-migrate-' + JQ_MIG + '/index.js')
-      .pipe( $.cond( !PRODUCTION, $.rename('jquery-migrate.js') ) )
-      .pipe( $.cond( !PRODUCTION, GULP.dest(target_dir) ) )
-  );  
-  return stream;
-});
-
-// Minify "bootstrap" JS file for production build
-GULP.task('javascript:minify:bootstrap', function() {
-  return GULP.src(JS_SRC + '/bootstrap.js')
-    .pipe($.uglify({preserveComments:"license"}))
-    .pipe($.replace('/*', '\n\n/*'))
-    .pipe($.replace('\n\n/*!', '/*!'))
-    .pipe($.extname(JS_EXT))
-    .pipe(GULP.dest(JS_DIST));
-});
-
-// Minify "jquery" JS file for production build
-GULP.task('javascript:minify:jquery', function() {
-  return GULP.src(JS_SRC + '/jquery.js')
-    .pipe($.uglify({preserveComments:"license"}))
-    .pipe($.extname(JS_EXT))
-    .pipe(GULP.dest(JS_DIST));
-});
-
-// Minify "zencart" JS file for production build
-GULP.task('javascript:minify:zencart', function() {
-  return GULP.src(JS_SRC + '/zencart.js')
-    .pipe($.uglify({preserveComments:"license"}))
-    .pipe($.replace('/*', '\n\n/*'))
-    .pipe($.replace('\n\n/*!', '/*!'))
-    .pipe($.extname(JS_EXT))
-    .pipe(GULP.dest(JS_DIST));
+GULP.task( 'javascript', function( done ) {
+	var admin_extra = GULP.src( ['src/assets/zc_admin/javascript/**/*.js'] );
+	var catalog_extra = GULP.src( ['src/assets/zc_catalog/javascript/**/*.js'] );
+	var app_extra = GULP.src( PATHS.js_extra )
+			.pipe( $.concat( 'app-extra.js' ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) );
+	
+	return STREAM.concat( 
+		GULP.src( ['src/bootswatch/javascript/bootswatch_demo.js'] )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) ),
+			
+		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.js'] )
+			// Compile for development build
+			.pipe( $.concat( 'app-main.js' ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
+				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
+			 )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_CATALOG_SRC + '/javascript' ), 
+				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
+			 )
+			// Minify file for production build
+			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
+			
+		GULP.src( ['src/components/jquery-' + JQ_VER + '/index.js'] )
+			.pipe( $.rename( 'jquery.js' ) )
+			.pipe( GULP.dest( DIST_DEMO_DEV + '/javascript' ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
+				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
+			 )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_CATALOG_SRC + '/javascript' ), 
+				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
+			 )
+			// Minify "jquery" JS file for production build
+			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
+			
+		$.merge( app_extra, admin_extra )
+			.pipe( $.concat( 'admin-extra.js' ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/javascript' ) ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) ),
+		$.merge( app_extra, admin_extra )
+			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+			.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra' + JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
+			
+		$.merge( app_extra, catalog_extra )
+			.pipe( $.concat( 'catalog-extra.js' ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_SRC + '/javascript' ) ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) ),
+		$.merge( app_extra, catalog_extra )
+			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+			.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra' + JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) )
+	 );
 });
 
 /*******************************
@@ -412,48 +412,223 @@ GULP.task('javascript:minify:zencart', function() {
   ****************************
 ********************************/
 // Copy image files to the "zencart" folder
-GULP.task('images', function() {
-  return GULP.src('src/assets/img/**/*')
-    .pipe(GULP.dest('zencart/img'));
+GULP.task( 'images', function() {
+	return STREAM.concat( 
+		GULP.src( ['src/bootswatch/images/**/*'] )
+			// Compile for demo in development build
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/images' ) ) ),
+			
+		GULP.src( ['src/assets/zc_admin/images/**/*'] )
+			// Compile for development build
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_PROD + '/images' ), 
+				GULP.dest( DIST_ADMIN_DEV + '/images' ) 
+			 ) ),
+			
+		GULP.src( ['src/assets/zc_catalog/images/**/*'] )
+			// Compile for development build
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_CATALOG_PROD + '/images' ), 
+				GULP.dest( DIST_CATALOG_DEV + '/images' ) 
+			 ) )
+	 );
 });
 
 /*******************************
   ****************************
-  * 09: COPY ASSESTS
+  * 09: COPY ASSETS
   ****************************
 ********************************/
 // Dispatcher to copy assets from "src/assets" folder
-GULP.task('copy', function(done) {
-  if(FONT_ICONS){
-    $.sequence(['copy:gen', 'copy:font'], done);
-  } else {
-    $.sequence('copy:gen', done);
-  }
+GULP.task( 'copy', function( done ) {
+	$.sequence( ['copy:plugins', 'copy:font'], done );
 });
 
-// Copy assets to "zencart" folder
-// Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:gen', function() {
-  return GULP.src(PATHS.assets)
-    .pipe(
-      $.cond(PRODUCTION, 
-        GULP.dest('zencart/production'), 
-        GULP.dest('zencart/dev')
-      )
-    );
+// JS Plugins Builder
+GULP.task( 'copy:plugins', function() {
+	var retval; 
+	if ( !PRODUCTION ) {
+		// PROCESS PLUGINS FOR DEVELOPMENT RUNS ( WE END UP WILL ALL AVAILABLE PLUGINS IN RETVAL VARIABLE )
+		retval = STREAM.concat( 
+			// Save all plugins apart from inputmask and flot ( processed separately ) to development destination folders
+			GULP.src( PATHS.js_plugins )
+				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins' ) )
+				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins' ) ),
+				
+			// Save main jquery.inputmask plugin file to development destination folders
+			GULP.src( ['src/assets/plugins/input-mask/jquery.inputmask.js'] )
+				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins/input-mask' ) )
+				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins/input-mask' ) ),
+				
+			// Combine jquery.inputmask plugin extension files to a single file and save to development destination folders
+			GULP.src( PATHS.inputmask_extensions )
+				.pipe( $.concat( 'jquery.inputmask-extensions.js' ) )
+				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins/input-mask' ) )
+				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins/input-mask' ) ),
+				
+			// Save jquery.inputmask phone code files to development destination folders
+			GULP.src( ['src/assets/plugins/input-mask/phone-codes/**/*'] )
+				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins/input-mask/phone-codes' ) )
+				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins/input-mask/phone-codes' ) )
+    	 ); 
+    } else {
+    	// PROCESS PLUGINS FOR PRODUCTION RUNS ( WE END UP WITH ONLY SPECIFIC PLUGINS IN RETVAL VARIABLE )
+    	retval = STREAM.concat( 
+    		// Minify and save select2 plugin js files excluding plugin localisation js files to production destination folders
+    		GULP.src( ['src/assets/plugins/select2/**/*.js', '!src/assets/plugins/select2/i18n/**/*.js'] )
+    			.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2' ) )
+				.pipe( $.uglify( {preserveComments:"license"} ) )
+				.pipe( $.batchReplace( CLEAN_UP ) )
+				.pipe( $.extname( JS_EXT ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
+				
+			// Save Select2 plugin localisation js files to production destination folders
+			GULP.src( ['src/assets/plugins/select2/i18n/**/*.js'] )
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2/i18n' ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2/i18n' ) ),
+				
+			// Minify and save select2 plugin css files to production destination folders
+			GULP.src( ['src/assets/plugins/select2/**/*.css'] )
+				// Apply CSS PostProcessing Rules
+				.pipe( $.postcss( CSS_PROCESS ) )
+				.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+				// Save to sources destination folder
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2' ) )
+				// Minify and save to production destination folder if this is a production run
+				.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
+				
+			// Minify and save daterangepicker plugin js files to production destination folders
+			GULP.src( ['src/assets/plugins/daterangepicker/**/*.js'] )
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/daterangepicker' ) )
+				.pipe( $.uglify( {preserveComments:"license"} ) )
+				.pipe( $.batchReplace( CLEAN_UP ) )
+				.pipe( $.extname( JS_EXT ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
+				
+			// Minify and save daterangepicker plugin css files to production destination folders
+			GULP.src( ['src/assets/plugins/daterangepicker/**/*.css'] )
+				// Apply CSS PostProcessing Rules
+				.pipe( $.postcss( CSS_PROCESS ) )
+				.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+				// Save to sources destination folder
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/daterangepicker' ) )
+				// Minify and save to production destination folder if this is a production run
+				.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
+				
+			// Minify and save moment plugin js files to production destination folders
+			GULP.src( ['src/assets/plugins/moment/**/*.js'] )
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/moment' ) )
+				.pipe( $.uglify( {preserveComments:"license"} ) )
+				.pipe( $.batchReplace( CLEAN_UP ) )
+				.pipe( $.extname( JS_EXT ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/moment' ) ),
+				
+			// Minify and save gridstack plugin js files to production destination folders
+			GULP.src( ['src/assets/plugins/gridstack/**/*.js'] )
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/gridstack' ) ) )
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/gridstack' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/gridstack' ) ) )
+				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) ) ),
+				
+			// Minify and save gridstack plugin css files to production destination folders
+			GULP.src( ['src/assets/plugins/gridstack/**/*.css'] )
+				// Apply CSS PostProcessing Rules
+				.pipe( $.postcss( CSS_PROCESS ) )
+				.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+				// Save to sources destination folder
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/gridstack' ) )
+				// Minify and save to production destination folder if this is a production run
+				.pipe( $.cond( PRODUCTION, $.cssnano() ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( CSS_EXT ) ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) )
+		 ); 
+	}
+	// PROCESS FLOT PLUGIN FOR BOTH PRODUCTION AND DEVELOPMENT RUNS & ADD TO RETVAL VERIABLE
+	retval = retval + STREAM.concat( 
+		// Main Flot JS File
+		GULP.src( ['src/assets/plugins/flot/jquery.flot.js'] )
+			// Save to development destination folders
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/flot' ) ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/flot' ) ) )
+			// Save to production "sources" destination folders
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/flot' ) ) )
+			// Minify and save to production destination folders
+			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) ),
+			
+		// Flot Plugin Extensions
+		GULP.src( PATHS.flot_plugins )
+			// Concatenate into a single file
+			.pipe( $.concat( 'jquery.flot-plugins.js' ) )
+			// Save to development destination folders
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/flot' ) ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/flot' ) ) )
+			// Save to production "sources" destination folders
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/flot' ) ) )
+			// Minify and save to production destination folders
+			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( JS_EXT ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) )
+  ); 
+  return retval;
 });
 
-// Copy assets to "zencart/**/fonts" floder
-// Skips the "img", "js", and "scss" folders, which are parsed separately
-GULP.task('copy:font', function() {
-  return GULP.src(FONT_PATH)
-    .pipe($.flatten())
-    .pipe(
-      $.cond(PRODUCTION, 
-        GULP.dest('zencart/production/fonts'), 
-        GULP.dest('zencart/dev/fonts')
-      )
-    );
+GULP.task( 'copy:demo:font', function() {
+	return GULP.src( 'src/fonts/lato/fonts/**/*' )
+		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/fonts' ) ) );
+});
+
+GULP.task( 'copy:glypicons', function() {
+	var destination = [];
+	if( PRODUCTION ) {
+		destination.push( 
+			GULP.dest( DIST_ADMIN_SRC + '/fonts' ),
+			GULP.dest( DIST_CATALOG_SRC + '/fonts' ),
+        	GULP.dest( DIST_ADMIN_PROD + '/fonts' ),
+        	GULP.dest( DIST_CATALOG_PROD + '/fonts' )
+		 );
+	} else {
+		destination.push( 
+			GULP.dest( DIST_ADMIN_DEV + '/fonts' ), 
+			GULP.dest( DIST_CATALOG_DEV + '/fonts' )
+		 );
+	}
+	return GULP.src( ['src/components/bootstrap-sass/assets/fonts/bootstrap/**/*'] )
+		.pipe( $.multistream.apply( undefined, destination ) );
+});
+
+// Copy font assets to "zencart/**/fonts" floder
+GULP.task( 'copy:font', ['copy:glypicons', 'copy:demo:font'], function() {
+	var destination = [];
+	if( PRODUCTION ) {
+		destination.push( 
+			GULP.dest( DIST_ADMIN_SRC + '/fonts' ),
+			GULP.dest( DIST_CATALOG_SRC + '/fonts' ),
+        	GULP.dest( DIST_ADMIN_PROD + '/fonts' ),
+        	GULP.dest( DIST_CATALOG_PROD + '/fonts' )
+		 );
+	} else {
+		destination.push( 
+			GULP.dest( DIST_ADMIN_DEV + '/fonts' ), 
+			GULP.dest( DIST_CATALOG_DEV + '/fonts' )
+		 );
+	}
+	return GULP.src( [FONT_PATH] )
+		.pipe( $.flatten() )
+		.pipe( $.multistream.apply( undefined, destination ) );
 });
 
 /*******************************
@@ -462,11 +637,10 @@ GULP.task('copy:font', function() {
   ****************************
 ********************************/
 // Build the site, run the server, and watch for file changes
-GULP.task('default', ['server'], function() {
-  GULP.watch(PATHS.assets, ['copy', BROWSER.reload]);
-  GULP.watch(['src/pages/**/*.html'], ['pages:regen', BROWSER.reload]);
-  GULP.watch(['src/{layouts,partials}/**/*.html'], ['pages:reset', BROWSER.reload]);
-  GULP.watch(['src/assets/scss/**/*.scss'], ['sass:regen', BROWSER.reload]);
-  GULP.watch(['src/assets/js/**/*.js'], ['javascript', BROWSER.reload]);
-  GULP.watch(['src/assets/img/**/*'], ['images', BROWSER.reload]);
+GULP.task( 'default', ['server'], function() {
+	GULP.watch( PATHS.assets, ['copy', BROWSER.reload] );
+	GULP.watch( ['src/pages/**/*.html'], ['pages:regen', BROWSER.reload] );
+	GULP.watch( ['src/assets/scss/**/*.scss'], ['sass', BROWSER.reload] );
+	GULP.watch( ['src/assets/javascript/**/*.js'], ['javascript', BROWSER.reload] );
+	GULP.watch( ['src/assets/img/**/*'], ['images', BROWSER.reload] );
 });
