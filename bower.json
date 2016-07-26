@@ -16,6 +16,6 @@
   ],
   "private": true,
   "devDependencies": {
-    "bootstrap-sass": "^3.3.7”
+    "bootstrap-sass": "^3.3.7"
   }
 }
