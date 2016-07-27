@@ -5,7 +5,7 @@
 
 @mixin btn($class,$bg){
   .btn-#{$class} {
-    background-size: 200%;
+    background-size: 200% 200%;
     background-position: 50%;
 
     &:focus {
@@ -20,11 +20,12 @@
     &:active {
       background-color: darken($bg, 12%);
       @include gradient-radial(darken($bg, 12%) 10%, $bg 11%);
-      background-size: 1000%;
+      background-size: 1000% 1000%;
       @include box-shadow(2px 2px 4px rgba(0,0,0,.4));
     }
   }
 }
+
 
 // Navbar =====================================================================
 
@@ -418,7 +419,6 @@ input[type="checkbox"],
 // Navs =======================================================================
 
 .nav-tabs {
-  margin-bottom: 15px;
   > li > a,
   > li > a:focus {
     margin-right: 0;
@@ -496,7 +496,7 @@ input[type="checkbox"],
     background-color: $brand-danger;
   }
 
-  a:not(.close),
+  a:not(.close):not(.btn),
   .alert-link {
     color: #fff;
     font-weight: bold;
@@ -511,11 +511,7 @@ input[type="checkbox"],
   padding: 4px 6px 4px;
 }
 
-
-// Progress bars ==============================================================
-
 .progress {
-  margin-bottom: 10px;
   position: relative;
   z-index: 1;
   height: 6px;
@@ -561,6 +557,7 @@ input[type="checkbox"],
   }
 }
 
+// Progress bars ==============================================================
 
 // Containers =================================================================
 

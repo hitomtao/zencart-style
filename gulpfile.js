@@ -198,38 +198,23 @@ GULP.task( 'sass', function( done ) {
 
 // Compile main Sass into CSS
 GULP.task( 'sass:main:compile', function() {
-	var dev_destination = [];
-	var prod_destination = [];
-	if( PRODUCTION ) {
-		dev_destination.push( 
-			GULP.dest( DIST_ADMIN_SRC + '/css' ),
-			GULP.dest( DIST_CATALOG_SRC + '/css' )
-		 );
-		prod_destination.push( 
-			GULP.dest( DIST_ADMIN_PROD + '/css' ), 
-			GULP.dest( DIST_CATALOG_PROD + '/css' )
-		 );
-	} else {
-		dev_destination.push( 
-			GULP.dest( DIST_DEMO_DEV + '/css' ), 
-			GULP.dest( DIST_ADMIN_DEV + '/css' ), 
-			GULP.dest( DIST_CATALOG_DEV + '/css' )
-		 );
-	}
-	
 	return GULP.src( 'src/bootswatch/scss/bootstrap.scss' )
-		.pipe( $.sass()
-			.on( 'error', $.sass.logError ) )
+		.pipe( $.sass().on( 'error', $.sass.logError ) )
 		.pipe( $.rename( 'app-main.css' ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
 		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
-		.pipe( $.multistream.apply( undefined, dev_destination ) )
+		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/css' ) ) )
+		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/css' ) ) )
+		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/css' ) ) )
+		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/css' ) ) )
+		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_SRC + '/css' ) ) )
 		
 		// Minify main CSS file for production build
-		.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+		.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 		.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 		.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
-		.pipe( $.cond( PRODUCTION, $.multistream.apply( undefined, prod_destination ) ) );
+		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) )
+		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) );
 });
 
 // Compile demo Sass into CSS
@@ -237,8 +222,7 @@ GULP.task( 'sass:demo:compile', function() {
 	var retvar;
 	if( !PRODUCTION ) {
 		retvar = GULP.src( ['src/bootswatch/scss/bootswatch_demo.scss'] )
-			.pipe( $.sass()
-				.on( 'error', $.sass.logError ) )
+			.pipe( $.sass().on( 'error', $.sass.logError ) )
 			.pipe( $.postcss( CSS_PROCESS ) )
 			.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
 			.pipe( GULP.dest( DIST_DEMO_DEV + '/css' ) );
@@ -249,18 +233,15 @@ GULP.task( 'sass:demo:compile', function() {
 // Compile extra CSS
 GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 	var admin_extra = GULP.src( ['src/assets/zc_admin/scss/zencart_admin.scss'] )
-		.pipe( $.sass()
-			.on( 'error', $.sass.logError ) )
+		.pipe( $.sass().on( 'error', $.sass.logError ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
 		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) );
 	var catalog_extra = GULP.src( ['src/assets/zc_catalog/scss/zencart_catalog.scss'] )
-		.pipe( $.sass()
-			.on( 'error', $.sass.logError ) )
+		.pipe( $.sass().on( 'error', $.sass.logError ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
 		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) );
 	var app_extra = GULP.src( ['src/bootswatch/scss/bootswatch.scss'] )
-		.pipe( $.sass()
-			.on( 'error', $.sass.logError ) )
+		.pipe( $.sass().on( 'error', $.sass.logError ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
 		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
 		.pipe( $.rename( 'app-extra.css' ) )
@@ -274,7 +255,7 @@ GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 				GULP.dest( DIST_ADMIN_DEV + '/css' ) 
 			 ) ),
 		$.merge( app_extra, admin_extra )
-			.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+			.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 			.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra.min.css' ) ) )
 			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) ),
@@ -286,7 +267,7 @@ GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 				GULP.dest( DIST_CATALOG_DEV + '/css' ) 
 			 ) ),
 		$.merge( app_extra, catalog_extra )
-			.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+			.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 			.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra.min.css' ) ) )
 			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) )
@@ -300,7 +281,6 @@ GULP.task( 'sass:fonts:compile', function( done ) {
 		.pipe( $.sass( {includePaths: PATHS.sass_fonts_include} )
 			.on( 'error', $.sass.logError ) )
 		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
-		.pipe( $.flatten() )
 		.pipe( $.concat( 'app-fonts.css' ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
 		.pipe( $.cond( PRODUCTION, 
@@ -314,7 +294,7 @@ GULP.task( 'sass:fonts:compile', function( done ) {
 		.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/css' ) ) )
         
          // Minify app-fonts CSS file for production build
-		.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+		.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 		.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 		.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) )
@@ -495,7 +475,7 @@ GULP.task( 'copy:plugins', function() {
 				// Save to sources destination folder
 				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2' ) )
 				// Minify and save to production destination folder if this is a production run
-				.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+				.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
@@ -516,7 +496,7 @@ GULP.task( 'copy:plugins', function() {
 				// Save to sources destination folder
 				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/daterangepicker' ) )
 				// Minify and save to production destination folder if this is a production run
-				.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+				.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
@@ -547,7 +527,7 @@ GULP.task( 'copy:plugins', function() {
 				// Save to sources destination folder
 				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/gridstack' ) )
 				// Minify and save to production destination folder if this is a production run
-				.pipe( $.cond( PRODUCTION, $.cssmin() ) )
+				.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false } ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) )
@@ -626,7 +606,7 @@ GULP.task( 'copy:font', ['copy:glypicons', 'copy:demo:font'], function() {
 			GULP.dest( DIST_CATALOG_DEV + '/fonts' )
 		 );
 	}
-	return GULP.src( [FONT_PATH] )
+	return GULP.src( FONT_PATH )
 		.pipe( $.flatten() )
 		.pipe( $.multistream.apply( undefined, destination ) );
 });
