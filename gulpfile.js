@@ -183,11 +183,6 @@ GULP.task( 'pages', function( done ) {
 	 );
 });
 
-// Rebuild HTML files
-GULP.task( 'pages:regen', function( done ) {
-	$.sequence( ['pages', 'sass'], done );
-});
-
 /*******************************
   ****************************
   * 06: BUILD CSS FILES
@@ -691,8 +686,8 @@ GULP.task( 'copy:font', ['copy:glypicons', 'copy:demo:font'], function() {
 // Build the site, run the server, and watch for file changes
 GULP.task( 'default', ['server'], function() {
 	GULP.watch( PATHS.assets, ['copy', BROWSER.reload] );
-	GULP.watch( ['src/pages/**/*.html'], ['pages:regen', BROWSER.reload] );
-	GULP.watch( ['src/assets/scss/**/*.scss'], ['sass', BROWSER.reload] );
-	GULP.watch( ['src/assets/javascript/**/*.js'], ['javascript', BROWSER.reload] );
-	GULP.watch( ['src/assets/img/**/*'], ['images', BROWSER.reload] );
+	GULP.watch( ['src/pages/**/*.html'], ['pages', BROWSER.reload] );
+	GULP.watch( ['src/**/*.scss'], ['sass', BROWSER.reload] );
+	GULP.watch( ['src/**/*.js'], ['javascript', BROWSER.reload] );
+	GULP.watch( ['src/assets/{zc_admin,zc_catalog}/images/**/*'], ['images', BROWSER.reload] );
 });
