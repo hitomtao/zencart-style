@@ -57,7 +57,7 @@ Your style guide will be created in the `zencart` folder and loaded in your brow
 
 You can now edit the various files in the src folder as desired and your changes will be immediately reflected in the browser.
 
-You can also add new html files to the `src/pages` and navigate to these at `http://locahost:port/pages/your-new-page.html`.
+You can also add new html files to the `src/pages` and navigate to these at `/pages/your-new-page.html`.
 
 When you are done, press `CTRL C` to stop the livereload process and run `npm run prod` to create compressed, production ready assets for Zen Cart.
 
