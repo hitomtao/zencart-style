@@ -644,26 +644,24 @@ body {
   body > .navbar {
     transition: background-color .3s ease-in; }
 
-.bs-section {
-  margin-top: 6em; }
-  .bs-section h1 {
-    padding-top: 100px; }
-  .bs-component,.bs-component .modal {
+.popover {
+  display: inline-block;
+  margin: 20px;
+  width: 220px; }
+
+.popover,.modal {
   position: relative; }
-  .bs-component .modal {
-    bottom: auto;
-    display: block;
-    left: auto;
-    right: auto;
-    top: auto;
-    z-index: 1; }
-  .bs-component .modal-dialog {
-    width: 90%; }
-  .bs-component .popover {
-    display: inline-block;
-    margin: 20px;
-    position: relative;
-    width: 220px; }
+
+.modal {
+  bottom: auto;
+  display: block;
+  left: auto;
+  right: auto;
+  top: auto;
+  z-index: 1; }
+
+.modal-dialog {
+  width: 90%; }
 
 .progress {
   margin-bottom: 10px; }

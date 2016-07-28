@@ -8,12 +8,13 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: stylesheet_print.css 2599 2005-12-18 23:36:49Z drbyte $
  */
+BODY {
+  width: 100%; }
 
-BODY {width: 100%}
-
-.headerBar, #navbar,
+.headerBar, [id="navbar"],
 .version-notify,
 .header-area, .footer-area, .noprint,
 .messageStack-header,
 footer.copyrightrow,
-.report-button { display: none;}
+.report-button {
+  display: none; }

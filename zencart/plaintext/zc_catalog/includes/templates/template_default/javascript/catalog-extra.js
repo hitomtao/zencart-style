@@ -1,9 +1,11 @@
 /*
- * Bootstrap_Helper.js - JavaScript routines for Zencart Style
- * Copyright (c) 2016 Dayo Akanji <dakanji@user.noreply.github.com>
+ * bootswatch_helper.js
+ *
+ * Copyright 2012-2016 Thomas Park
+ * Copyright 2016 Dayo Akanji <dakanji@user.noreply.github.com>
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
-!function(){$('.bs-component [data-toggle="popover"]').popover(),$('.bs-component [data-toggle="tooltip"]').tooltip()}();
+!function(){$('[data-toggle="popover"]').popover(),$('[data-toggle="tooltip"]').tooltip()}();
 /*!
  * Modernizr v2.8.3
  * www.modernizr.com
@@ -133,91 +135,6 @@ zcJS.timer = function (options) {
   };
 };
 
-$(function() {
-  $('FORM[name="quick_find"]')
-    .submit(function() {
-      $(this).children("input[type='submit']").prop("disabled", true).before('<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only">Loading...</span>');
-      $(this).children('input[name="keyword"]').keypress(function(e){
-        if (e.which == 13) e.preventDefault();
-      });
-    });
-  });
-/** the following is the more modern way to do the keypress thing:
-$('.noEnterSubmit').bind('keypress', false);
-*/
-
-/** used by product-reviews-write */
-function popupWindow(url) {
-  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,width=100,height=100,screenX=150,screenY=150,top=150,left=150')
-}
-
-function popupWindowCheckout(url) {
-  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=320,screenX=150,screenY=150,top=150,left=150');
-}
-
-function couponpopupWindow(url) {
-  window.open(url,'couponpopupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=320,screenX=150,screenY=150,top=150,left=150');
-}
-
-function popupWindowAdvSearch(url) {
-  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=280,screenX=150,screenY=150,top=150,left=150')
-}
-
-function popupWindowShoppingCart(url) {
-  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=550,height=550,screenX=150,screenY=100,top=100,left=150')
-}
-
-function popupWindowPrice(url) {
-  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=600,height=400,screenX=150,screenY=150,top=150,left=150')
-}
-
-function popupInfoShoppingCart() {
-  window.open('index.php?main_page=info_shopping_cart',"info_shopping_cart","height=460,width=430,toolbar=no,statusbar=no,scrollbars=yes").focus();
-}
-
-// window resizing
-function resizeSearchHelpPopup() {
-  var i=0;
-  if (navigator.appName == 'Netscape') i=40;
-  if (document.images[0]) window.resizeTo(document.images[0].width +30, document.images[0].height+60-i);
-  self.focus();
-}
-
-// window resizing
-function resizeCouponPopup() {
-  var i=0;
-  if (navigator.appName == 'Netscape') i=10;
-  if (document.images[0]) {
-    imgHeight = document.images[0].height+45-i;
-    imgWidth = document.images[0].width+30;
-    var height = screen.height;
-    var width = screen.width;
-    var leftpos = width / 2 - imgWidth / 2;
-    var toppos = height / 2 - imgHeight / 2;
-    window.moveTo(leftpos, toppos);
-    window.resizeTo(imgWidth, imgHeight);
-  }
-  self.focus();
-}
-
-/**
- * @package templateSystem
- * @copyright Copyright 2003-2016 Zen Cart Development Team
- * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id$
- */
-
-// Shipping Estimator auto-submit form after selecting an address from address-book
-$(".autosubmit select, SELECT#seAddressPulldown").change(function() {
-    $(this).closest('form').submit();
-});
-
-/**
- * On multiple-product pages where cart-quantity is displayed, set focus on first item
- */
-$('form[name="multiple_products_cart_quantity"]').find(':input[type="number"]:enabled:visible:first, :input:text:enabled:visible:first').focus();
-
-
 /**
  * Javascript - for checkout and some simple helpers
  *
@@ -321,3 +238,88 @@ function collectsCardDataOnsite(paymentValue)
  return false;
 }
 
+
+/**
+ * @package templateSystem
+ * @copyright Copyright 2003-2016 Zen Cart Development Team
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id$
+ */
+
+// Shipping Estimator auto-submit form after selecting an address from address-book
+$(".autosubmit select, SELECT#seAddressPulldown").change(function() {
+    $(this).closest('form').submit();
+});
+
+/**
+ * On multiple-product pages where cart-quantity is displayed, set focus on first item
+ */
+$('form[name="multiple_products_cart_quantity"]').find(':input[type="number"]:enabled:visible:first, :input:text:enabled:visible:first').focus();
+
+
+$(function() {
+  $('FORM[name="quick_find"]')
+    .submit(function() {
+      $(this).children("input[type='submit']").prop("disabled", true).before('<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only">Loading...</span>');
+      $(this).children('input[name="keyword"]').keypress(function(e){
+        if (e.which == 13) e.preventDefault();
+      });
+    });
+  });
+/** the following is the more modern way to do the keypress thing:
+$('.noEnterSubmit').bind('keypress', false);
+*/
+
+/** used by product-reviews-write */
+function popupWindow(url) {
+  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,width=100,height=100,screenX=150,screenY=150,top=150,left=150')
+}
+
+function popupWindowCheckout(url) {
+  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=320,screenX=150,screenY=150,top=150,left=150');
+}
+
+function couponpopupWindow(url) {
+  window.open(url,'couponpopupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=320,screenX=150,screenY=150,top=150,left=150');
+}
+
+function popupWindowAdvSearch(url) {
+  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=450,height=280,screenX=150,screenY=150,top=150,left=150')
+}
+
+function popupWindowShoppingCart(url) {
+  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=550,height=550,screenX=150,screenY=100,top=100,left=150')
+}
+
+function popupWindowPrice(url) {
+  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=600,height=400,screenX=150,screenY=150,top=150,left=150')
+}
+
+function popupInfoShoppingCart() {
+  window.open('index.php?main_page=info_shopping_cart',"info_shopping_cart","height=460,width=430,toolbar=no,statusbar=no,scrollbars=yes").focus();
+}
+
+// window resizing
+function resizeSearchHelpPopup() {
+  var i=0;
+  if (navigator.appName == 'Netscape') i=40;
+  if (document.images[0]) window.resizeTo(document.images[0].width +30, document.images[0].height+60-i);
+  self.focus();
+}
+
+// window resizing
+function resizeCouponPopup() {
+  var i=0;
+  if (navigator.appName == 'Netscape') i=10;
+  if (document.images[0]) {
+    imgHeight = document.images[0].height+45-i;
+    imgWidth = document.images[0].width+30;
+    var height = screen.height;
+    var width = screen.width;
+    var leftpos = width / 2 - imgWidth / 2;
+    var toppos = height / 2 - imgHeight / 2;
+    window.moveTo(leftpos, toppos);
+    window.resizeTo(imgWidth, imgHeight);
+  }
+  self.focus();
+}

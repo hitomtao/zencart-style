@@ -73,33 +73,25 @@ body {
     }
 }
 
-.bs-section {
-    margin-top: 6em;
-    h1 {
-    	padding-top: 100px
-    }
+.popover {
+	position: relative;
+	display: inline-block;
+	width: 220px;
+	margin: 20px
 }
 
-.bs-component {
-    position: relative;
-	.modal {
-		position: relative;
-		top: auto;
-		right: auto;
-		left: auto;
-		bottom: auto;
-		z-index: 1;
-		display: block
-	}
-	.modal-dialog {
-		width: 90%
-	}
-	.popover {
-		position: relative;
-		display: inline-block;
-		width: 220px;
-		margin: 20px
-	}
+
+.modal {
+	position: relative;
+	top: auto;
+	right: auto;
+	left: auto;
+	bottom: auto;
+	z-index: 1;
+	display: block
+}
+.modal-dialog {
+	width: 90%
 }
 
 .progress {

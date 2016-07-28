@@ -189,15 +189,13 @@ GULP.task( 'pages:regen', function( done ) {
 // CSS build dispatcher
 GULP.task( 'sass', function( done ) {
 	$.sequence( 
-	[
-		'sass:main:compile', 
-		'sass:extra:compile', 
-		'sass:fonts:compile' 
-	], done );
+		['sass:main', 'sass:extra', 'sass:fonts'],
+		['sass:demo', 'sass:print', 'sass:legacy'],
+	done );
 });
 
-// Compile main Sass into CSS
-GULP.task( 'sass:main:compile', function() {
+// Compile main CSS
+GULP.task( 'sass:main', function() {
 	return GULP.src( 'src/bootswatch/scss/bootstrap.scss' )
 		.pipe( $.sass().on( 'error', $.sass.logError ) )
 		.pipe( $.rename( 'app-main.css' ) )
@@ -217,8 +215,8 @@ GULP.task( 'sass:main:compile', function() {
 		.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) );
 });
 
-// Compile demo Sass into CSS
-GULP.task( 'sass:demo:compile', function() {
+// Compile demo CSS
+GULP.task( 'sass:demo', function() {
 	var retvar;
 	if( !PRODUCTION ) {
 		retvar = GULP.src( ['src/bootswatch/scss/bootswatch_demo.scss'] )
@@ -230,8 +228,74 @@ GULP.task( 'sass:demo:compile', function() {
 	return retvar;
 });
 
+// Compile print CSS
+GULP.task( 'sass:print', function() {
+	return STREAM.concat( 
+		GULP.src( ['src/assets/zc_admin/scss/admin_print.scss'] )
+			.pipe( $.sass().on( 'error', $.sass.logError ) )
+			.pipe( $.rename( 'admin-print.css' ) )
+			.pipe( $.postcss( CSS_PROCESS ) )
+			.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/css' ),
+				GULP.dest( DIST_ADMIN_DEV + '/css' ) 
+		 	) )
+			.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) ),
+		
+		GULP.src( ['src/assets/zc_catalog/scss/catalog_print.scss'] )
+			.pipe( $.sass().on( 'error', $.sass.logError ) )
+			.pipe( $.rename( 'catalog-print.css' ) )
+			.pipe( $.postcss( CSS_PROCESS ) )
+			.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_CATALOG_SRC + '/css' ),
+				GULP.dest( DIST_CATALOG_DEV + '/css' ) 
+		 	) )
+			.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) )
+	 );
+});
+
+// Compile legacy CSS
+GULP.task( 'sass:legacy', function() {
+	return STREAM.concat( 
+		GULP.src( ['src/assets/zc_admin/scss/legacy/admin_legacy.scss'] )
+			.pipe( $.sass().on( 'error', $.sass.logError ) )
+			.pipe( $.rename( 'admin-legacy.css' ) )
+			.pipe( $.postcss( CSS_PROCESS ) )
+			.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/css' ),
+				GULP.dest( DIST_ADMIN_DEV + '/css' ) 
+		 	) )
+			.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/css' ) ) ),
+		
+		GULP.src( ['src/assets/zc_catalog/scss/legacy/catalog_legacy.scss'] )
+			.pipe( $.sass().on( 'error', $.sass.logError ) )
+			.pipe( $.rename( 'catalog-legacy.css' ) )
+			.pipe( $.postcss( CSS_PROCESS ) )
+			.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_CATALOG_SRC + '/css' ),
+				GULP.dest( DIST_CATALOG_DEV + '/css' ) 
+		 	) )
+			.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
+			.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
+			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/css' ) ) )
+	 );
+});
+
 // Compile extra CSS
-GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
+GULP.task( 'sass:extra', function( done ) {
 	var admin_extra = GULP.src( ['src/assets/zc_admin/scss/zencart_admin.scss'] )
 		.pipe( $.sass().on( 'error', $.sass.logError ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
@@ -274,8 +338,8 @@ GULP.task( 'sass:extra:compile', ['sass:demo:compile'], function( done ) {
 	 );
 });
 
-// Prep fonts Sass
-GULP.task( 'sass:fonts:compile', function( done ) {
+// Compile font CSS
+GULP.task( 'sass:fonts', function( done ) {
 	return GULP.src( [FONT_SASS + '**/*.scss'] )
 		.pipe( $.injectString.prepend( "@import 'unit';\n\n" ) )
 		.pipe( $.sass( {includePaths: PATHS.sass_fonts_include} )
@@ -321,10 +385,11 @@ GULP.task( 'javascript', function( done ) {
 		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.js'] )
 			// Compile for development build
 			.pipe( $.rename( 'app-main.js' ) )
+			// Save for demo if not Production run
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
 			// Prepend functions to resolve Bootstrap/JQuery-UI conflicts
 			.pipe( $.injectString.prepend(UI_FIX) ) 
 			
-			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
 				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
