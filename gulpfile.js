@@ -170,10 +170,17 @@ GULP.task( 'pages', function( done ) {
 		'fonts_css': fonts_css_file,
 	});
 	
-	return GULP.src( 'src/index.html' )
-		.pipe( replace_html )
-		.pipe( $.prettify() )
-		.pipe( GULP.dest( 'zencart' ) );
+	return STREAM.concat( 
+		GULP.src( ['src/pages/**/*.html', '!src/pages/index.html'] )
+			.pipe( replace_html )
+			.pipe( $.prettify() )
+			.pipe( GULP.dest( 'zencart/pages' ) ),
+		
+		GULP.src( ['src/pages/index.html'] )
+			.pipe( replace_html )
+			.pipe( $.prettify() )
+			.pipe( GULP.dest( 'zencart' ) )
+	 );
 });
 
 // Rebuild HTML files
