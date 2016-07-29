@@ -343,11 +343,14 @@ GULP.task( 'sass:extra', function( done ) {
 // Compile font CSS
 GULP.task( 'sass:fonts', function( done ) {
 	return GULP.src( [FONT_SASS + '**/*.scss'] )
+		// Needed to build foundation-icons without the whole foundation
 		.pipe( $.injectString.prepend( "@import 'unit';\n\n" ) )
+		
+		// Process and rename
 		.pipe( $.sass( {includePaths: PATHS.sass_fonts_include} )
 			.on( 'error', $.sass.logError ) )
-		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
 		.pipe( $.concat( 'app-fonts.css' ) )
+		.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
 		.pipe( $.postcss( CSS_PROCESS ) )
 		.pipe( $.cond( PRODUCTION, 
         	GULP.dest( DIST_ADMIN_SRC + '/css' ),
@@ -384,11 +387,11 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) );
 	
 	return STREAM.concat( 
-		// DEMO PAGE SPECIFIC JS
+// DEMO PAGE SPECIFIC JS
 		GULP.src( ['src/bootswatch/javascript/bootswatch_demo.js'] )
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) ),
 			
-		// BOOTSTRAP BASED MAIN JS FILE
+// BOOTSTRAP BASED MAIN JS FILE
 		// Process for development build
 		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.js'] )
 			// Rename bootstrap.js
@@ -416,7 +419,7 @@ GULP.task( 'javascript', function( done ) {
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/jscript' ) ) ),
 			
-		// JQUERY
+// JQUERY
 		GULP.src( ['src/components/jquery/dist/jquery.js'] )
 			// Save to relevant locations
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
@@ -434,7 +437,7 @@ GULP.task( 'javascript', function( done ) {
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/jscript' ) ) ),
 				
-		// JQUERY-UI			
+// JQUERY-UI			
 		GULP.src( ['src/components/jquery-ui/jquery-ui.js'] )
 			// Save to relevant locations
 			.pipe( $.cond( PRODUCTION, 
@@ -463,7 +466,7 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
 			.pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) ),
 
-		// ADMIN EXTRA JS 			
+// ADMIN EXTRA JS 			
 		$.merge( app_extra, admin_extra )
 			// Concatenate streams into a single file 
 			.pipe( $.concat( 'admin-extra.js' ) )
@@ -480,7 +483,7 @@ GULP.task( 'javascript', function( done ) {
 				// Save to relevant locations
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
 				
-		// CATALOG EXTRA JS 			
+// CATALOG EXTRA JS 			
 		$.merge( app_extra, catalog_extra )
 			// Concatenate streams into a single file 
 			.pipe( $.concat( 'catalog-extra.js' ) )
