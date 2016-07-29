@@ -374,6 +374,9 @@ GULP.task( 'sass:fonts', function( done ) {
 ********************************/
 // JS build dispatcher
 GULP.task( 'javascript', function( done ) {
+	var admin_dir = PRODUCTION ? DIST_ADMIN_SRC + '/javascript' : DIST_ADMIN_DEV + '/javascript';
+	var catalog_dir = PRODUCTION ? DIST_CATALOG_SRC + '/jscript' : DIST_CATALOG_DEV + '/jscript';
+  
 	var admin_extra = GULP.src( ['src/assets/zc_admin/javascript/**/*.js'] );
 	var catalog_extra = GULP.src( ['src/assets/zc_catalog/javascript/**/*.js'] );
 	var app_extra = GULP.src( PATHS.js_extra )
@@ -381,75 +384,118 @@ GULP.task( 'javascript', function( done ) {
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) );
 	
 	return STREAM.concat( 
+		// DEMO PAGE SPECIFIC JS
 		GULP.src( ['src/bootswatch/javascript/bootswatch_demo.js'] )
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) ),
 			
+		// BOOTSTRAP BASED MAIN JS FILE
+		// Process for development build
 		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.js'] )
-			// Compile for development build
+			// Rename bootstrap.js
 			.pipe( $.rename( 'app-main.js' ) )
 			// Save for demo if not Production run
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
 			// Prepend functions to resolve Bootstrap/JQuery-UI conflicts
 			.pipe( $.injectString.prepend(UI_FIX) ) 
-			
+			// Save to relevant locations
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
 				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
 			 )
 			.pipe( $.cond( PRODUCTION, 
-				GULP.dest( DIST_CATALOG_SRC + '/javascript' ), 
-				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
+				GULP.dest( DIST_CATALOG_SRC + '/jscript' ), 
+				GULP.dest( DIST_CATALOG_DEV + '/jscript' ) ) 
 			 ),
-			 
-		GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.min.js'] )
-			// Compile for production build
-			.pipe( $.rename( 'app-main.min.js' ) )
-			// Prepend functions to resolve Bootstrap/JQuery-UI conflicts
-			.pipe( $.injectString.prepend(UI_FIX) ) 
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
+			// Process for production build
+			 GULP.src( ['src/components/bootstrap-sass/assets/javascripts/bootstrap.min.js'] )
+				// Rename bootstrap.min.js
+				.pipe( $.rename( 'app-main.min.js' ) )
+				// Prepend functions to resolve Bootstrap/JQuery-UI conflicts
+				.pipe( $.injectString.prepend(UI_FIX) ) 
+				// Save to relevant locations
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/jscript' ) ) ),
 			
-		GULP.src( ['src/components/jquery-ui/jquery-ui.js'] )
-			.pipe( $.cond( PRODUCTION, 
-				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
-				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
-			),
-			GULP.src( ['src/components/jquery-ui/jquery-ui.min.js'] )
-				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
-			
+		// JQUERY
 		GULP.src( ['src/components/jquery/dist/jquery.js'] )
+			// Save to relevant locations
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/javascript' ) ) )
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
 				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
 			 )
 			.pipe( $.cond( PRODUCTION, 
-				GULP.dest( DIST_CATALOG_SRC + '/javascript' ), 
-				GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) 
+				GULP.dest( DIST_CATALOG_SRC + '/jscript' ), 
+				GULP.dest( DIST_CATALOG_DEV + '/jscript' ) ) 
 			 ),
+			// Process for production build
 			GULP.src( ['src/components/jquery/dist/jquery.min.js'] )
+				// Save to relevant locations
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) )
-				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) ),
-			
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/jscript' ) ) ),
+				
+		// JQUERY-UI			
+		GULP.src( ['src/components/jquery-ui/jquery-ui.js'] )
+			// Save to relevant locations
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
+				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
+			),
+			// Process for production build
+			GULP.src( ['src/components/jquery-ui/jquery-ui.min.js'] )
+				// Save to relevant locations
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
+				
+		// JQUERY-UI LOCALISATION FILES
+		GULP.src(['src/components/jquery-ui/ui/i18n/*.js'])
+			// Concatenate into a single file 
+			.pipe( $.concat('jquery-ui-i18n.js') )
+			// Prepend Licensing Information 
+			.pipe( $.injectString.prepend("/*! jQueryUI i18n | Copyright jQuery Foundation and other contributors | MIT License */\n\n") )
+			// Save to development or sources folders depending on whether this is a production run or not
+			.pipe( $.cond( PRODUCTION, 
+				GULP.dest( DIST_ADMIN_SRC + '/javascript' ), 
+				GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) 
+			 )
+			// Minify and save to production destination folders if this is a production run
+			.pipe( $.cond(PRODUCTION, $.uglify({preserveComments:"license"}) ) )
+			.pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
+			.pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
+			.pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/javascript') ) ),
+
+		// ADMIN EXTRA JS 			
 		$.merge( app_extra, admin_extra )
+			// Concatenate streams into a single file 
 			.pipe( $.concat( 'admin-extra.js' ) )
+			// Save to relevant locations
 			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/javascript' ) ) )
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/javascript' ) ) ),
+			// Process for production build
 			$.merge( app_extra, admin_extra )
+				// Minify streams separately to maintain code blocks under licenses 
 				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				// Concatenate minified streams into a single file and separate licensed sections
 				.pipe( $.cond( PRODUCTION, $.concat( 'admin-extra.min.js' ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				// Save to relevant locations
 				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/javascript' ) ) ),
-			
+				
+		// CATALOG EXTRA JS 			
 		$.merge( app_extra, catalog_extra )
+			// Concatenate streams into a single file 
 			.pipe( $.concat( 'catalog-extra.js' ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_SRC + '/javascript' ) ) )
-			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/javascript' ) ) ),
+			// Save to relevant locations
+			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_SRC + '/jscript' ) ) )
+			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_CATALOG_DEV + '/jscript' ) ) ),
+			// Process for production build
 			$.merge( app_extra, catalog_extra )
+				// Minify streams separately to maintain code blocks under licenses 
 				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				// Concatenate minified streams into a single file and separate licensed sections
 				.pipe( $.cond( PRODUCTION, $.concat( 'catalog-extra.min.js' ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/javascript' ) ) )
+				// Save to relevant locations
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_CATALOG_PROD + '/jscript' ) ) )
 	 );
 });
 
@@ -462,18 +508,18 @@ GULP.task( 'javascript', function( done ) {
 GULP.task( 'images', function() {
 	return STREAM.concat( 
 		GULP.src( ['src/bootswatch/images/**/*'] )
-			// Compile for demo in development build
+			// Process for demo in development build
 			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/images' ) ) ),
 			
 		GULP.src( ['src/assets/zc_admin/images/**/*'] )
-			// Compile for development build
+			// Process for development build
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_ADMIN_PROD + '/images' ), 
 				GULP.dest( DIST_ADMIN_DEV + '/images' ) 
 			 ) ),
 			
 		GULP.src( ['src/assets/zc_catalog/images/**/*'] )
-			// Compile for development build
+			// Process for development build
 			.pipe( $.cond( PRODUCTION, 
 				GULP.dest( DIST_CATALOG_PROD + '/images' ), 
 				GULP.dest( DIST_CATALOG_DEV + '/images' ) 
@@ -494,48 +540,40 @@ GULP.task( 'copy', function( done ) {
 // JS Plugins Builder
 GULP.task( 'copy:plugins', function() {
 	var retval; 
-	if ( !PRODUCTION ) {
-		// PROCESS PLUGINS FOR DEVELOPMENT RUNS ( WE END UP WILL ALL AVAILABLE PLUGINS IN RETVAL VARIABLE )
-		retval = STREAM.concat( 
-			// Save all plugins apart from inputmask and flot ( processed separately ) to development destination folders
-			GULP.src( PATHS.js_plugins )
-				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins' ) )
-				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins' ) ),
-				
-			// Save main jquery.inputmask plugin file to development destination folders
-			GULP.src( ['src/assets/plugins/input-mask/jquery.inputmask.js'] )
-				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins/input-mask' ) )
-				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins/input-mask' ) ),
-				
-			// Combine jquery.inputmask plugin extension files to a single file and save to development destination folders
-			GULP.src( PATHS.inputmask_extensions )
-				.pipe( $.concat( 'jquery.inputmask-extensions.js' ) )
-				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins/input-mask' ) )
-				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins/input-mask' ) ),
-				
-			// Save jquery.inputmask phone code files to development destination folders
-			GULP.src( ['src/assets/plugins/input-mask/phone-codes/**/*'] )
-				.pipe( GULP.dest( DIST_DEMO_DEV + '/plugins/input-mask/phone-codes' ) )
-				.pipe( GULP.dest( DIST_ADMIN_DEV + '/plugins/input-mask/phone-codes' ) )
-    	 ); 
-    } else {
+	if ( PRODUCTION ) {
     	// PROCESS PLUGINS FOR PRODUCTION RUNS ( WE END UP WITH ONLY SPECIFIC PLUGINS IN RETVAL VARIABLE )
     	retval = STREAM.concat( 
-    		// Minify and save select2 plugin js files excluding plugin localisation js files to production destination folders
-    		GULP.src( ['src/assets/plugins/select2/**/*.js', '!src/assets/plugins/select2/i18n/**/*.js'] )
+    	
+// SELECT2 PLUGIN   	
+    		// Minify and save select2 plugin js file to production destination folders
+    		GULP.src( ['src/assets/plugins/select2/js/select2.full.js'] )
     			.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2' ) )
 				.pipe( $.uglify( {preserveComments:"license"} ) )
 				.pipe( $.batchReplace( CLEAN_UP ) )
 				.pipe( $.extname( '.min.js' ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
 				
-			// Save Select2 plugin localisation js files to production destination folders
-			GULP.src( ['src/assets/plugins/select2/i18n/**/*.js'] )
-				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/select2/i18n' ) )
-				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2/i18n' ) ),
+			// Select2 localisation files	
+			GULP.src( ['src/assets/plugins/select2/js/i18n/**/*.js'] )
+				// Remove repeated minimal individual licences
+				.pipe( $.uglify( {compress:false} ) )
+				// Concatenate into a single file 
+				.pipe( $.concat('select2-i18n.js') )
+				// Prepend Licensing Information 
+				.pipe( $.injectString.prepend("/*!\n * Select2 4.0.3\n * https://select2.github.io\n * Copyright 2016\n *        Kevin Brown (https://github.com/kevin-brown)\n *        Igor Vaynberg (https://github.com/ivaynberg)\n *        Project Contributors (https://github.com/select2/select2/graphs/contributors)\n * Released under the MIT license\n * https://github.com/select2/select2/blob/master/LICENSE.md\n */\n") )
+				// Save to development or sources folders depending on whether this is a production run or not
+				.pipe( $.cond( PRODUCTION, 
+					GULP.dest( DIST_ADMIN_SRC + '/plugins/select2' ), 
+					GULP.dest( DIST_ADMIN_DEV + '/plugins/select2' ) ) 
+				)
+				// Minify and save to production destination folders if this is a production run
+				.pipe( $.cond(PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond(PRODUCTION, $.batchReplace(CLEAN_UP) ) )
+				.pipe( $.cond(PRODUCTION, $.extname('.min.js') ) )
+				.pipe( $.cond(PRODUCTION, GULP.dest(DIST_ADMIN_PROD + '/plugins/select2') ) ),
 				
 			// Minify and save select2 plugin css files to production destination folders
-			GULP.src( ['src/assets/plugins/select2/**/*.css'] )
+			GULP.src( ['src/assets/plugins/select2/css/select2.css'] )
 				// Apply CSS PostProcessing Rules
 				.pipe( $.postcss( CSS_PROCESS ) )
 				.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
@@ -546,36 +584,8 @@ GULP.task( 'copy:plugins', function() {
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
 				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/select2' ) ),
-				
-			// Minify and save daterangepicker plugin js files to production destination folders
-			GULP.src( ['src/assets/plugins/daterangepicker/**/*.js'] )
-				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/daterangepicker' ) )
-				.pipe( $.uglify( {preserveComments:"license"} ) )
-				.pipe( $.batchReplace( CLEAN_UP ) )
-				.pipe( $.extname( '.min.js' ) )
-				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
-				
-			// Minify and save daterangepicker plugin css files to production destination folders
-			GULP.src( ['src/assets/plugins/daterangepicker/**/*.css'] )
-				// Apply CSS PostProcessing Rules
-				.pipe( $.postcss( CSS_PROCESS ) )
-				.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
-				// Save to sources destination folder
-				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/daterangepicker' ) )
-				// Minify and save to production destination folder if this is a production run
-				.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
-				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
-				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/daterangepicker' ) ),
-				
-			// Minify and save moment plugin js files to production destination folders
-			GULP.src( ['src/assets/plugins/moment/**/*.js'] )
-				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/moment' ) )
-				.pipe( $.uglify( {preserveComments:"license"} ) )
-				.pipe( $.batchReplace( CLEAN_UP ) )
-				.pipe( $.extname( '.min.js' ) )
-				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/moment' ) ),
-				
+
+// GRIDSTACK PLUGIN   					
 			// Minify and save gridstack plugin js files to production destination folders
 			GULP.src( ['src/assets/plugins/gridstack/**/*.js'] )
 				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/gridstack' ) ) )
@@ -597,40 +607,63 @@ GULP.task( 'copy:plugins', function() {
 				.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
 				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
 				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
-				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) )
-		 ); 
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/gridstack' ) ),
+
+// POPUPCALENDAR PLUGIN   					
+			// Minify and save popupcalendar plugin js files to production destination folders
+			GULP.src( ['src/assets/plugins/popupcalendar/**/*.js'] )
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/popupcalendar' ) ) )
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/popupcalendar' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/popupcalendar' ) ) )
+				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/popupcalendar' ) ) ),
+				
+			// Minify and save popupcalendar plugin css files to production destination folders
+			GULP.src( ['src/assets/plugins/popupcalendar/**/*.css'] )
+				// Apply CSS PostProcessing Rules
+				.pipe( $.postcss( CSS_PROCESS ) )
+				.pipe( $.autoprefixer( {browsers: COMPATIBILITY} ) )
+				// Save to sources destination folder
+				.pipe( GULP.dest( DIST_ADMIN_SRC + '/plugins/popupcalendar' ) )
+				// Minify and save to production destination folder if this is a production run
+				.pipe( $.cond( PRODUCTION, $.cssnano( {discardUnused: false} ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.css' ) ) )
+				.pipe( GULP.dest( DIST_ADMIN_PROD + '/plugins/popupcalendar' ) ),
+
+// FLOT PLUGIN   					
+			// Main Flot JS File
+			GULP.src( ['src/assets/plugins/flot/jquery.flot.js'] )
+				// Save to development destination folders
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/flot' ) ) )
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/flot' ) ) )
+				// Save to production "sources" destination folders
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/flot' ) ) )
+				// Minify and save to production destination folders
+				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) ),
+				
+			// Flot Plugin Extensions
+			GULP.src( PATHS.flot_plugins )
+				// Concatenate into a single file
+				.pipe( $.concat( 'jquery.flot-plugins.js' ) )
+				// Save to development destination folders
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/flot' ) ) )
+				.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/flot' ) ) )
+				// Save to production "sources" destination folders
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/flot' ) ) )
+				// Minify and save to production destination folders
+				.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
+				.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
+				.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
+				.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) )
+		); 
 	}
-	// PROCESS FLOT PLUGIN FOR BOTH PRODUCTION AND DEVELOPMENT RUNS & ADD TO RETVAL VERIABLE
-	retval = retval + STREAM.concat( 
-		// Main Flot JS File
-		GULP.src( ['src/assets/plugins/flot/jquery.flot.js'] )
-			// Save to development destination folders
-			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/flot' ) ) )
-			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/flot' ) ) )
-			// Save to production "sources" destination folders
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/flot' ) ) )
-			// Minify and save to production destination folders
-			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) ),
-			
-		// Flot Plugin Extensions
-		GULP.src( PATHS.flot_plugins )
-			// Concatenate into a single file
-			.pipe( $.concat( 'jquery.flot-plugins.js' ) )
-			// Save to development destination folders
-			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_DEMO_DEV + '/plugins/flot' ) ) )
-			.pipe( $.cond( !PRODUCTION, GULP.dest( DIST_ADMIN_DEV + '/plugins/flot' ) ) )
-			// Save to production "sources" destination folders
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_SRC + '/plugins/flot' ) ) )
-			// Minify and save to production destination folders
-			.pipe( $.cond( PRODUCTION, $.uglify( {preserveComments:"license"} ) ) )
-			.pipe( $.cond( PRODUCTION, $.batchReplace( CLEAN_UP ) ) )
-			.pipe( $.cond( PRODUCTION, $.extname( '.min.js' ) ) )
-			.pipe( $.cond( PRODUCTION, GULP.dest( DIST_ADMIN_PROD + '/plugins/flot' ) ) )
-  ); 
-  return retval;
+	return retval;
 });
 
 GULP.task( 'copy:demo:font', function() {

@@ -1,0 +1,109 @@
+/*!
+ * Bazillyo's Spiffy DHTML Popup Calendar v. 1.0 
+ * Copyright 2000 S. Ousta
+ */
+
+/*
+*  Popup Calendar Styles
+*/
+.head,.text {
+	font-family: arial;
+	font-size: 12px;
+	font-weight: normal;
+}
+.text {
+	padding: 2px;
+}
+[id="popupcalendar"] {
+	background-color: black;
+	height:130px;
+	left: 0px;
+	position: absolute;
+	top: 0px;
+	visibility: hidden;
+	width: 185px;
+}
+
+a.cal-DayLink {
+    color: black;
+    font-family: Verdana,  Arial, sans-serif;
+    font-weight: normal;
+}
+a.cal-DayLink,a.cal-DayLink:hover {
+    background-color: transparent;
+    font-size: 8pt;
+    text-decoration: none;
+}
+a.cal-DayLink:hover {
+    color: Blue;
+    font-family: Verdana, Arial, sans-serif;
+    font-weight: bold;
+}
+a.cal-DayLink:active {
+    background-color: transparent;
+    color: #0066FF;
+    text-decoration: none;
+}
+a.cal-DayLink:active,.cal-TextBox{
+   font-family: Verdana,  Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: normal;
+}
+.cal-TextBox{
+    background-color: #FFFFCC;
+    color: Black;
+}
+a.cal-TodayLink {
+    color: red;
+}
+a.cal-TodayLink,a.cal-TodayLink:hover {
+    background-color: transparent;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    text-decoration: none;
+}
+a.cal-TodayLink:hover {
+    color: Blue;
+}
+a.cal-TodayLink:active {
+    background-color: transparent;
+    color: #0066FF;
+    font-family: Verdana,  Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    text-decoration: none;
+}
+.cal-GreyDate {
+    font-family: Verdana,  Arial, sans-serif;
+    text-decoration: none;
+}
+.cal-GreyDate,.cal-GreyInvalidDate {
+	background-color: #FFFFCC;
+    color: #999999;
+    font-size: 8pt;
+    font-weight: normal;
+}
+.cal-GreyInvalidDate {
+    font-family: Verdana, Arial, sans-serif;
+    text-decoration: line-through;
+}
+.cal-DayCell {
+	background-color:White;
+    font-weight: normal;
+}
+.cal-DayCell,.cal-HeadCell {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 8pt;
+}
+.cal-HeadCell {
+	background-color: #99CCCC;
+    font-weight: bold;
+}
+.cal-Table{
+	background-color:black;
+	border-bottom-color:  #99CCCC;
+	border-left-color: #99CCCC;
+	border-right-color: #99CCCC;
+	border-top-color: #99CCCC;
+}
